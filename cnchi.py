@@ -46,6 +46,7 @@ import welcome
 import language
 import location
 import check
+import wireless
 import desktop
 import keymap
 import timezone
@@ -201,6 +202,7 @@ class Main(Gtk.Window):
         self.pages["language"] = language.Language(params)
         self.pages["location"] = location.Location(params)
         self.pages["check"] = check.Check(params)
+        self.pages["wireless"] = wireless.Wireless(params)
         self.pages["desktop"] = desktop.DesktopAsk(params)
         self.pages["keymap"] = keymap.Keymap(params)
         self.pages["timezone"] = timezone.Timezone(params)
