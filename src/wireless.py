@@ -89,6 +89,7 @@ class Wireless(Gtk.Box):
         self.have_selection = True
         self.use_wireless.set_active(True)
         assert self.state is not None
+        '''
         frontend = self.controller._wizard
         if self.state == nm.NM_STATE_CONNECTING:
             frontend.translate_widget(frontend.next)
@@ -101,8 +102,11 @@ class Wireless(Gtk.Box):
             else:
                 frontend.next.set_label(self.connect_text)
                 self.next_normal = False
+        '''
 
     def wireless_toggled(self, unused):
+        print("wireless_toggled")
+        '''
         frontend = self.controller._wizard
         if self.use_wireless.get_active():
             if not self.have_selection:
@@ -116,6 +120,7 @@ class Wireless(Gtk.Box):
             self.nmwidget.hbox.set_sensitive(False)
             self.next_normal = True
             self.controller.allow_go_forward(True)
+        '''
 
     def plugin_set_online_state(self, online):
         self.skip = online
@@ -126,6 +131,7 @@ class Wireless(Gtk.Box):
         else:
             return self.skip
 
+    '''
     def plugin_on_back_clicked(self):
         frontend = self.controller._wizard
         if frontend.back.get_label() == self.stop_text:
@@ -148,8 +154,10 @@ class Wireless(Gtk.Box):
             frontend.connecting_spinner.stop()
             frontend.connecting_label.hide()
             return False
-
+    '''
     def state_changed(self, unused, state):
+        print("state_changed")
+        '''
         self.state = state
         frontend = self.controller._wizard
         if not self.use_wireless.get_active():
@@ -174,9 +182,11 @@ class Wireless(Gtk.Box):
             self.back_normal = False
             frontend.back.set_sensitive(True)
         self.selection_changed(None)
+        '''
 
     def pw_validated(self, unused, validated):
-        self.controller.allow_go_forward(validated)
+        pass
+        #self.controller.allow_go_forward(validated)
 
     def get_prev_page(self):
         return _prev_page
@@ -186,3 +196,6 @@ class Wireless(Gtk.Box):
 
     def prepare(self, direction):
         self.show_all()
+
+    def store_values(self):
+        return True
