@@ -22,7 +22,6 @@ import dbus
 from gi.repository import Gtk
 import misc, nm
 
-
 NAME = 'wireless'
 
 _next_page = "desktop"
@@ -30,12 +29,8 @@ _prev_page = "check"
 
 WEIGHT = 12
 
-
 class Wireless(Gtk.Box):
-
     def __init__(self, params):
-        
-
         self.title = params['title']
         self.ui_dir = params['ui_dir']
         self.settings = params['settings']
@@ -44,8 +39,7 @@ class Wireless(Gtk.Box):
 
         super().__init__()
 
-        # Check whether we can talk to NM at all (e.g. debugging ubiquity
-        # over ssh with X forwarding).
+        # Check whether we can talk to NM at all
         try:
             misc.has_connection()
         except dbus.DBusException:
@@ -54,18 +48,17 @@ class Wireless(Gtk.Box):
 
         self.ui = Gtk.Builder()
 
-        self.ui.add_from_file(os.path.join(self.ui_dir, "check.ui"))
+        self.ui.add_from_file(os.path.join(self.ui_dir, "wireless.ui"))
         self.ui.connect_signals(self)
 
-        
         self.page = self.ui.get_object('wireless')
         self.nmwidget = self.ui.get_object('nmwidget')
-        # self.nmwidget.connect('connection', self.state_changed)
-        # self.nmwidget.connect('selection_changed', self.selection_changed)
-        # self.nmwidget.connect('pw_validated', self.pw_validated)
+        self.nmwidget.connect('connection', self.state_changed)
+        self.nmwidget.connect('selection_changed', self.selection_changed)
+        self.nmwidget.connect('pw_validated', self.pw_validated)
         self.no_wireless = self.ui.get_object('no_wireless')
         self.use_wireless = self.ui.get_object('use_wireless')
-        # self.use_wireless.connect('toggled', self.wireless_toggled)
+        self.use_wireless.connect('toggled', self.wireless_toggled)
         self.plugin_widgets = self.page
         self.have_selection = False
         self.state = self.nmwidget.get_state()
@@ -74,6 +67,8 @@ class Wireless(Gtk.Box):
         self.connect_text = None
         self.stop_text = None
         self.skip = False
+        
+        super().add(self.ui.get_object("wireless"))
 
     def plugin_translate(self, lang):
         pass
