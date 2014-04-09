@@ -43,6 +43,7 @@
         <pkgname>antergos-wallpapers</pkgname>
         <pkgname>chromium</pkgname>
         <pkgname>libreoffice-installer</pkgname>
+        <pkgname>light-locker</pkgname>
         <pkgname dm='true' name='lightdm'>lightdm</pkgname>
         <pkgname>lightdm-webkit-greeter</pkgname>
         <pkgname>lightdm-webkit-theme-antergos</pkgname>
