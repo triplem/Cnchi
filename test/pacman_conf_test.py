@@ -35,21 +35,22 @@ logger.debug("parentdir: %s" % parentdir)
 
 from installation.process import InstallationProcess
 
-# set needed config options
-settings = dict()
-settings['data'] = os.path.join(parentdir, 'data')
+def test_pacman_conf_creation():
+    # set needed config options
+    settings = dict()
+    settings['data'] = os.path.join(parentdir, 'data')
 
-# create mock object to test just one method and not the __init__
-mobject = Mock(InstallationProcess)
+    # create mock object to test just one method and not the __init__
+    mobject = Mock(InstallationProcess)
 
-mobject.settings = settings
-mobject.dest_dir = '/tmp'
-mobject.arch = 'x86_64'
+    mobject.settings = settings
+    mobject.dest_dir = '/tmp'
+    mobject.arch = 'x86_64'
 
-mobject.write_file = InstallationProcess.write_file.__get__(mobject)
+    mobject.write_file = InstallationProcess.write_file.__get__(mobject)
 
-InstallationProcess.create_pacman_conf_file(mobject)
+    InstallationProcess.create_pacman_conf_file(mobject)
 
-logger.debug('Done')
+    logger.debug('Done')
 
-assert os.path.isfile('/tmp/pacman.conf')
+    assert os.path.isfile('/tmp/pacman.conf')

@@ -23,7 +23,7 @@
 import os, sys
 import logging
 
-from io import StringIO
+# we need lxml for a validation (cannot be done with standard etree) - python-lxml
 from lxml import etree
 
 logging.basicConfig(level=10)
@@ -36,9 +36,15 @@ sys.path.append(os.path.join(parentdir, 'src'))
 logger.debug("parentdir: %s" % parentdir)
 
 
-schema_doc = etree.parse(StringIO('../data/editions.xsd'))
+schema_doc = etree.parse('data/editions.xsd')
 schema = etree.XMLSchema(schema_doc)
 
-tree = etree.parse(StringIO('../data/editions.xml'))
+tree = etree.parse('data/editions.xml')
 
-schema.validate(tree)
+if not schema(tree):
+    print("Invalid xml")
+    log = schema.error_log
+    error = log.last_error
+    print(error)
+else:
+    print('Everything alright...')

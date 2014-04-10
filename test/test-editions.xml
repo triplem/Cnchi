@@ -60,7 +60,7 @@
             <pkgname>networkmanager-openvpn</pkgname>
         </edition>
 
-        <edition name="xfce" title="Xfce" lib="gtk" extends="graphic_common">
+        <edition name="xfce" title="Xfce" lib="gtk" enabled="false" extends="graphic_common">
             <description>
                 Xfce is a lightweight desktop environment. It aims to
                 be fast and low on system resources, while remaining visually
@@ -73,19 +73,6 @@
             <pkgname>xfce4-taskmanager</pkgname>
             <pkgname>xnoise</pkgname>
             <pkgname>zukitwo-themes</pkgname>
-        </edition>
-
-        <edition name="razor" title="Razor-QT" lib="qt" extends="graphic_common">
-            <description>
-                Razor-qt is an advanced, easy-to-use, and fast desktop
-                environment based on Qt technologies. It has been
-                tailored for users who value simplicity, speed, and
-                an intuitive interface.
-            </description>
-
-            <pkgname nm='connman' conflicts='netctl'>qconnman-ui</pkgname>
-            <pkgname>transmission-qt</pkgname>
-            <pkgname>vlc</pkgname>
         </edition>
 
         <edition name="nox" title="Base Install" extends="common">
