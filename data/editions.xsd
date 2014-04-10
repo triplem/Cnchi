@@ -1,0 +1,176 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+
+    <xs:annotation>
+        <xs:documentation>
+            This schema describes the XML for the Cnchi Installer. It defines different editions and their contained
+            packages (see: pkgname), features (see: feature) as well as allowed user features.
+            User features are selectable by the user during the install process.
+        </xs:documentation>
+    </xs:annotation>
+
+
+    <xs:element name="cnchi">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="editions" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="features" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="userfeatures" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="filesystems" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="editions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="edition" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:key name="editionKey">
+            <xs:selector xpath="edition" />
+            <xs:field xpath="@name" />
+        </xs:key>
+    </xs:element>
+
+    <xs:element name="features">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="feature" type="featureType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="userfeatures">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="userfeature" type="featureType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="filesystems">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="filesystem" type="filesystemType" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="filesystemName">
+            <xs:selector xpath="filesystem"/>
+            <xs:field xpath="@name"/>
+        </xs:unique>
+    </xs:element>
+
+    <xs:element name="edition">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="pkgname" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="featureset" type="featuresetType" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="userfeatureset" type="userfeaturesetType" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:ID" use="required"/>
+            <xs:attribute name="lib" type="libType" use="optional"/>
+            <xs:attribute name="extends" type="xs:IDREF" use="optional"/>
+            <xs:attribute name="enabled" type="xs:boolean" default="true"/>
+            <xs:attribute name="showInInstaller" type="xs:boolean" default="true"/>
+        </xs:complexType>
+        <xs:keyref  name="extendsKeyref" refer="editionKey">
+            <xs:selector xpath="edition" />
+            <xs:field    xpath="@extends" />
+        </xs:keyref>
+    </xs:element>
+
+    <xs:complexType name="featuresetType">
+        <xs:sequence>
+            <xs:element name="feature" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:restriction base="xs:anyType">
+                            <xs:attribute name="ref" type="xs:string"/>
+                        </xs:restriction>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="userfeaturesetType">
+        <xs:sequence>
+            <xs:element name="userfeature" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:restriction base="xs:anyType">
+                            <xs:attribute name="ref" type="xs:string" use="required"/>
+                        </xs:restriction>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="featureType">
+        <xs:sequence>
+            <xs:element ref="pkgname" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="description" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="filesystemType">
+        <xs:sequence>
+            <xs:element ref="pkgname" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+    </xs:complexType>
+
+    <xs:element name="pkgname">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="source" type="sourceType" default="repo"/>
+                    <xs:attribute name="lib" type="libType"/>
+                    <xs:attribute name="conflicts" type="xs:string"/>
+
+                    <!-- Note: only one of the two following should be set -->
+                    <xs:attribute name="nm" type="networkManagerType"/>
+                    <xs:attribute name="dm" type="desktopManagerType"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="sourceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="repo"/>
+            <xs:enumeration value="aur"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="libType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="qt"/>
+            <xs:enumeration value="gtk"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="networkManagerType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NetworkManager"/>
+            <xs:enumeration value="conman"/>
+            <xs:enumeration value="netctl"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="desktopManagerType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="gdm"/>
+            <xs:enumeration value="lxdm"/>
+            <xs:enumeration value="slim"/>
+            <xs:enumeration value="lightdm"/>
+            <xs:enumeration value="slim"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

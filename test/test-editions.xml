@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cnchi  xmlns="http://antergos.com/cnchi/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://antergos.com/cnchi/">
+
+    <!-- This file is just an excerpt for testing purposes, do not use it in production ;-) -->
+
+    <editions>
+
+        <edition name="common" title="Common" showInInstaller="false">
+            <description>
+                Common packages for all other editions
+            </description>
+
+            <pkgname>alsa-utils</pkgname>
+            <pkgname>antergos-keyring</pkgname>
+            <pkgname>antergos-mirrorlist</pkgname>
+        </edition>
+
+        <!-- Common to all graphic desktops -->
+        <!-- It's best to put here apps that are qt/gtk agnostic -->
+        <edition name="graphic_common" title="Graphic Common" showInInstaller="false" extends="common">
+            <description>
+                Common Graphic packages
+            </description>
+
+            <pkgname>accountsservice</pkgname>
+            <pkgname>antergos-wallpapers</pkgname>
+            <pkgname>chromium</pkgname>
+            <pkgname>libreoffice-installer</pkgname>
+            <pkgname>light-locker</pkgname>
+            <pkgname dm='lightdm'>lightdm</pkgname>
+        </edition>
+
+        <edition name="gnome" title="Gnome3" lib="gtk" extends="graphic_common">
+            <description>
+                Gnome 3 is an easy and elegant way to use your computer. It features the Activities Overview which
+                is an easy way to access all your basic tasks. GNOME 3 is the default desktop in Antergos.
+            </description>
+
+            <pkgname>antergos-gnome-defaults-list</pkgname>
+            <pkgname>cdrkit</pkgname>
+            <pkgname>empathy</pkgname>
+            <pkgname>evince</pkgname>
+            <pkgname>eog</pkgname>
+            <pkgname nm='NetworkManager'>network-manager-applet</pkgname>
+            <pkgname>networkmanager-openvpn</pkgname>
+        </edition>
+
+        <edition name="cinnamon" title="Cinnamon" lib="gtk" extends="graphic_common">
+            <description>
+                Cinnamon is a fork of GNOME 3 developed
+                by (and for) Linux Mint. It provides users a more traditional desktop
+                interface along with the newest compositing techniques of GNOME 3.
+                Cinnamon is for users of all experience levels.
+            </description>
+
+            <pkgname>nemo</pkgname>
+            <pkgname nm='NetworkManager'>network-manager-applet</pkgname>
+            <pkgname>networkmanager-openvpn</pkgname>
+        </edition>
+
+        <edition name="xfce" title="Xfce" lib="gtk" extends="graphic_common">
+            <description>
+                Xfce is a lightweight desktop environment. It aims to
+                be fast and low on system resources, while remaining visually
+                appealing and user friendly. It is a great option for use
+                on older computers or those with low hardware specifications.
+            </description>
+
+            <pkgname nm='NetworkManager'>network-manager-applet</pkgname>
+            <pkgname>xfce4-screenshooter</pkgname>
+            <pkgname>xfce4-taskmanager</pkgname>
+            <pkgname>xnoise</pkgname>
+            <pkgname>zukitwo-themes</pkgname>
+        </edition>
+
+        <edition name="razor" title="Razor-QT" lib="qt" extends="graphic_common">
+            <description>
+                Razor-qt is an advanced, easy-to-use, and fast desktop
+                environment based on Qt technologies. It has been
+                tailored for users who value simplicity, speed, and
+                an intuitive interface.
+            </description>
+
+            <pkgname nm='connman' conflicts='netctl'>qconnman-ui</pkgname>
+            <pkgname>transmission-qt</pkgname>
+            <pkgname>vlc</pkgname>
+        </edition>
+
+        <edition name="nox" title="Base Install" extends="common">
+            <description>
+                Base system without X (nox)
+            </description>
+
+            <!-- archivers -->
+            <pkgname>arj</pkgname>
+            <pkgname>cabextract</pkgname>
+            <pkgname>bzip2</pkgname>
+            <pkgname>fastjar</pkgname>
+            <pkgname>lz4</pkgname>
+            <pkgname>lzo2</pkgname>
+            <pkgname>lzop</pkgname>
+            <pkgname>rpmextract</pkgname>
+            <pkgname>sharutils</pkgname>
+            <pkgname>unace</pkgname>
+            <pkgname>uudeview</pkgname>
+            <pkgname>unrar</pkgname>
+            <pkgname>xz</pkgname>
+            <pkgname>zip</pkgname>
+        </edition>
+    </editions>
+
+    <features>
+
+    </features>
+
+<!--
+    <net>
+        <broadcom>
+            <pkgname>broadcom-wl</pkgname>
+        </broadcom>
+    </net>
+
+    <special_fonts>
+        <chinese>
+            <pkgname>opendesktop-fonts</pkgname>
+        </chinese>
+    </special_fonts>
+
+    <ntp>
+        <pkgname>ntp</pkgname>
+    </ntp>
+
+    <grub>
+        <pkgname>grub</pkgname>
+        <pkgname>os-prober</pkgname>
+        <pkgname uefi="true">efibootmgr</pkgname>
+        <pkgname uefi="true">dosfstools</pkgname>
+    </grub>
+-->
+
+    <filesystems>
+        <filesystem name="btrfs">
+            <pkgname>btrfs-progs</pkgname>
+        </filesystem>
+        <filesystem name="ext">
+            <pkgname>e2fsprogs</pkgname>
+        </filesystem>
+        <filesystem name="jfs">
+            <pkgname>jfsutils</pkgname>
+        </filesystem>
+        <filesystem name="nilfs2">
+            <pkgname>nilfs-utils</pkgname>
+        </filesystem>
+        <filesystem name="ntfs">
+            <pkgname>ntfs-3g</pkgname>
+        </filesystem>
+        <filesystem name="raid">
+            <pkgname>dmraid</pkgname>
+        </filesystem>
+        <filesystem name="reiserfs">
+            <pkgname>reiserfsprogs</pkgname>
+        </filesystem>
+        <filesystem name="vfat">
+            <pkgname>dosfstools</pkgname>
+        </filesystem>
+        <filesystem name="xfs">
+            <pkgname>xfsprogs</pkgname>
+        </filesystem>
+    </filesystems>
+
+    <!-- User desired features -->
+<!--
+    <userfeatures>
+        <userfeature name="aur">
+            <pkgname>yaourt</pkgname>
+            <pkgname>cmake</pkgname>
+            <pkgname>git</pkgname>
+            <pkgname>bzr</pkgname>
+        </userfeature>
+        <userfeature name="bluetooth">
+            <pkgname lib='qt'>bluedevil</pkgname>
+            <pkgname>bluez-utils</pkgname>
+            <pkgname lib='gtk'>gnome-bluetooth</pkgname>
+        </userfeature>
+        <userfeature name="cups">
+            <pkgname>cups</pkgname>
+            <pkgname>cups-pk-helper</pkgname>
+            <pkgname>foomatic-db-nonfree</pkgname>
+            <pkgname>gsfonts</pkgname>
+            <pkgname>gutenprint</pkgname>
+            <pkgname>hplip</pkgname>
+            <pkgname lib='qt'>kdeutils-print-manager</pkgname>
+            <pkgname lib='gtk'>system-config-printer</pkgname>
+            <pkgname>splix</pkgname>
+        </userfeature>
+-->
+<!--
+        <userfeature name="gnome_extra">
+-->
+            <!-- Gnome extra installs brasero, so why install xfburn too? -->
+<!--
+            <pkgname conflicts='xfburn'>gnome-extra</pkgname>
+        </userfeature>
+        <userfeature name="fonts">
+-->
+            <!-- <pkgname>ttf-droid</pkgname> -->
+<!--
+            <pkgname>ttf-freefont</pkgname>
+            <pkgname conflicts='ttf-droid'>ttf-google-fonts</pkgname>
+        </userfeature>
+        <userfeature name="office">
+            <pkgname>libreoffice-calc</pkgname>
+            <pkgname>libreoffice-common</pkgname>
+            <pkgname lib='gtk'>libreoffice-gnome</pkgname>
+            <pkgname>libreoffice-impress</pkgname>
+            <pkgname lib='qt'>libreoffice-kde4</pkgname>
+            <pkgname>libreoffice-writer</pkgname>
+        </userfeature>
+-->
+        <!-- visual effects for openbox -->
+<!--
+        <userfeature name="visual">
+            <pkgname>compton</pkgname>
+            <pkgname>paranoid</pkgname>
+        </userfeature>
+-->
+        <!-- Uncomplicated firewall -->
+<!--
+        <userfeature name="firewall">
+            <pkgname lib='gtk'>gufw</pkgname>
+            <pkgname lib='qt'>kcm-ufw</pkgname>
+            <pkgname>ufw</pkgname>
+        </userfeature>
+-->
+        <!-- Third party software. Some of it is proprietary -->
+<!--
+        <userfeature name="third_party">
+            <pkgname>flashplugin</pkgname>
+            <pkgname>libdvdcss</pkgname>
+        </userfeature>
+    </userfeatures>
+-->
+</cnchi>
