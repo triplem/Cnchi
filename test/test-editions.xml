@@ -4,9 +4,7 @@
         xsi:schemaLocation="http://antergos.com/cnchi/">
 
     <!-- This file is just an excerpt for testing purposes, do not use it in production ;-) -->
-
     <editions>
-
         <edition name="common" title="Common" showInInstaller="false">
             <description>
                 Common packages for all other editions
@@ -58,6 +56,11 @@
             <pkgname>nemo</pkgname>
             <pkgname nm='NetworkManager'>network-manager-applet</pkgname>
             <pkgname>networkmanager-openvpn</pkgname>
+
+            <userfeatureset>
+                <userfeature ref="aur"/>
+                <userfeature ref="cups"/>
+            </userfeatureset>
         </edition>
 
         <edition name="xfce" title="Xfce" lib="gtk" enabled="false" extends="graphic_common">
@@ -158,9 +161,12 @@
     </filesystems>
 
     <!-- User desired features -->
-<!--
     <userfeatures>
-        <userfeature name="aur">
+        <userfeature name="aur" title="AUR">
+            <description>
+                ArchUserRepository
+            </description>
+
             <pkgname>yaourt</pkgname>
             <pkgname>cmake</pkgname>
             <pkgname>git</pkgname>
@@ -171,7 +177,7 @@
             <pkgname>bluez-utils</pkgname>
             <pkgname lib='gtk'>gnome-bluetooth</pkgname>
         </userfeature>
-        <userfeature name="cups">
+        <userfeature name="cups" title="CUPS">
             <pkgname>cups</pkgname>
             <pkgname>cups-pk-helper</pkgname>
             <pkgname>foomatic-db-nonfree</pkgname>
@@ -182,18 +188,11 @@
             <pkgname lib='gtk'>system-config-printer</pkgname>
             <pkgname>splix</pkgname>
         </userfeature>
--->
-<!--
         <userfeature name="gnome_extra">
--->
             <!-- Gnome extra installs brasero, so why install xfburn too? -->
-<!--
             <pkgname conflicts='xfburn'>gnome-extra</pkgname>
         </userfeature>
         <userfeature name="fonts">
--->
-            <!-- <pkgname>ttf-droid</pkgname> -->
-<!--
             <pkgname>ttf-freefont</pkgname>
             <pkgname conflicts='ttf-droid'>ttf-google-fonts</pkgname>
         </userfeature>
@@ -205,28 +204,22 @@
             <pkgname lib='qt'>libreoffice-kde4</pkgname>
             <pkgname>libreoffice-writer</pkgname>
         </userfeature>
--->
         <!-- visual effects for openbox -->
-<!--
         <userfeature name="visual">
             <pkgname>compton</pkgname>
             <pkgname>paranoid</pkgname>
         </userfeature>
--->
         <!-- Uncomplicated firewall -->
-<!--
         <userfeature name="firewall">
             <pkgname lib='gtk'>gufw</pkgname>
             <pkgname lib='qt'>kcm-ufw</pkgname>
             <pkgname>ufw</pkgname>
         </userfeature>
--->
         <!-- Third party software. Some of it is proprietary -->
-<!--
         <userfeature name="third_party">
             <pkgname>flashplugin</pkgname>
             <pkgname>libdvdcss</pkgname>
         </userfeature>
     </userfeatures>
--->
+
 </cnchi>

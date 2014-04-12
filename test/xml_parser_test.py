@@ -62,7 +62,16 @@ def test_packages():
 
     packages = parser.packages('gnome')
 
-    print(len(packages))
-
     assert len(packages) == 16
 
+def test_available_userfeatures():
+
+    parser = XmlParser("test/test-editions.xml")
+
+    user_features = parser.available_userfeatures('cinnamon')
+
+    assert len(user_features) == 2
+
+    assert user_features[0]['description'] == 'ArchUserRepository'
+
+    assert user_features[1].get('description', 'EMPTY') == 'EMPTY'

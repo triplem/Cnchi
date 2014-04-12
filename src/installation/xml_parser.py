@@ -53,7 +53,10 @@ class XmlParser:
                 edition = {}
                 edition['name'] = xml_edition.get('name')
                 edition['title'] = xml_edition.get('title')
-                edition['description'] = xml_edition.find('description')
+
+                description = xml_edition.find("{0}description".format(self.namespace))
+                if description is not None:
+                    edition['description'] = description.text.strip()
 
                 editions.append(edition)
 
@@ -99,6 +102,57 @@ class XmlParser:
                 packages.append(package)
 
         return packages
+
+    def available_userfeatures(self, edition_name):
+        """
+            returns the list of all available userfeatures and their informations
+
+            the returned dict has the following fields:
+
+            name - the name of the userfeature
+            title - the title of the userfeature
+            description - the description of the userfeature
+        """
+
+        user_features = []
+
+        for xml_user_feature_ref in self.tree.findall("{0}editions/{0}edition/[@name='{1}']/{0}userfeatureset/{0}userfeature".format(self.namespace, edition_name)):
+            reference = xml_user_feature_ref.get('ref')
+
+            for xml_user_feature in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, reference)):
+                user_feature = {}
+                user_feature['name'] = xml_user_feature.get('name')
+                user_feature['title'] = xml_user_feature.get('title')
+                description = xml_user_feature.find("{0}description".format(self.namespace))
+                if description is not None:
+                    user_feature['description'] = description.text.strip()
+
+                user_features.append(user_feature)
+
+        return user_features
+
+    def packages_selected_userfeature(self, userfeature_name):
+        packages = []
+
+        for xml_edition in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, userfeature_name)):
+            for xml_package in xml_edition.findall("./{0}pkgname".format(self.namespace)):
+                package = {}
+
+                package['name'] = xml_package.text
+
+                if 'nm' in xml_package.attrib:
+                    package['nm'] = xml_package.get('nm')
+
+                if 'dm' in xml_package.attrib:
+                    package['dm'] = xml_package.get('dm')
+
+                if 'conflicts' in xml_package.attrib:
+                    package['conflicts'] = xml_package.get('conflicts')
+
+                packages.append(package)
+
+        return packages
+
 
 
     def transform_to_boolean(self, element, attrib_name):

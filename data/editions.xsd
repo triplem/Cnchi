@@ -36,18 +36,22 @@
         </xs:key>
     </xs:element>
 
-    <xs:element name="features">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="feature" type="featureType" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
     <xs:element name="userfeatures">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="userfeature" type="featureType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:key name="userfeatureKey">
+            <xs:selector xpath="userfeature" />
+            <xs:field xpath="@name" />
+        </xs:key>
+    </xs:element>
+
+    <xs:element name="features">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="feature" type="featureType" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -115,10 +119,11 @@
 
     <xs:complexType name="featureType">
         <xs:sequence>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element ref="pkgname" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute type="xs:string" name="name" use="required"/>
-        <xs:attribute type="xs:string" name="description" use="optional"/>
+        <xs:attribute type="xs:string" name="title" use="optional"/>
     </xs:complexType>
 
     <xs:complexType name="filesystemType">
