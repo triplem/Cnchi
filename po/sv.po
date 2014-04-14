@@ -1475,7 +1475,7 @@ msgid ""
 "setups. Please proceed with caution as data loss is possible!\n"
 "\n"
 "If you find any bugs, please report them at <a href='http://bugs.antergos.com'>http://bugs.antergos.com</a>"
-msgstr ""
+msgstr "Cnchi är fortfarande under aktiv utveckling .\nDen hanterar ännu inte RAID, btrfs delvolumer, eller andra avancerade inställningar. Fortsätt med försiktighet då det är möjligt att data kan försvinna!\nOm du hittar några fel, var vänlig rapportera dessa på sidan <a href='http://bugs.antergos.com'>http://bugs.antergos.com</a>"
 
 #: src/language.py:97 src/welcome.py:102
 msgid "Welcome to Antergos!"

@@ -1474,7 +1474,7 @@ msgid ""
 "setups. Please proceed with caution as data loss is possible!\n"
 "\n"
 "If you find any bugs, please report them at <a href='http://bugs.antergos.com'>http://bugs.antergos.com</a>"
-msgstr ""
+msgstr "Cnchi – це пре-реліз програмного забезпечення, що знаходиться в активній розробці.\nВоно ще не працює належним чином з RAID, підтомами btrfs, та іншими розширеними надбудованим. Будь ласка, парцюйте обережно, оскільки можлива втрата даних. \n\nЯкщо ви знайшли будь-який недолік, сповістіть про нього на <a href='http://bugs.antergos.com'>http://bugs.antergos.com</a>"
 
 #: src/language.py:97 src/welcome.py:102
 msgid "Welcome to Antergos!"
