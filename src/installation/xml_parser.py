@@ -62,7 +62,7 @@ class XmlParser:
 
         return editions
 
-    def packages(self, edition_name):
+    def packages_edition(self, edition_name, filter={}):
         """
             determines all packages belonging to the given edition.
             if the edition extends another edition, these packages are added to the returned list as well.
@@ -72,34 +72,15 @@ class XmlParser:
             which returns just the first found element is only returning the content (children) of the found
             element, and not the element itself.
 
-            the returned dict has the following fields:
-
-            name - the name of the edition, a required field
-            nm -
-            dm -
-            conflicts -
+            the returned dict is constructed in the method packages
         """
         packages = []
 
         for xml_edition in self.tree.findall("{0}editions/{0}edition/[@name='{1}']".format(self.namespace, edition_name)):
             if 'extends' in xml_edition.attrib:
-                packages.extend(self.packages(xml_edition.get('extends')))
+                packages.extend(self.packages_edition(xml_edition.get('extends')))
 
-            for xml_package in xml_edition.findall("./{0}pkgname".format(self.namespace)):
-                package = {}
-
-                package['name'] = xml_package.text
-
-                if 'nm' in xml_package.attrib:
-                    package['nm'] = xml_package.get('nm')
-
-                if 'dm' in xml_package.attrib:
-                    package['dm'] = xml_package.get('dm')
-
-                if 'conflicts' in xml_package.attrib:
-                    package['conflicts'] = xml_package.get('conflicts')
-
-                packages.append(package)
+            packages.extend(self.packages(xml_edition, filter))
 
         return packages
 
@@ -113,7 +94,6 @@ class XmlParser:
             title - the title of the userfeature
             description - the description of the userfeature
         """
-
         user_features = []
 
         for xml_user_feature_ref in self.tree.findall("{0}editions/{0}edition/[@name='{1}']/{0}userfeatureset/{0}userfeature".format(self.namespace, edition_name)):
@@ -131,28 +111,91 @@ class XmlParser:
 
         return user_features
 
-    def packages_selected_userfeature(self, userfeature_name):
+    def packages_feature(self, feature_name, filter={}):
+        """
+            Returns the packages included in the given feature
+
+            the returned dict is constructed in the method packages
+        """
+        packages = []
+
+        for xml_edition in self.tree.findall("{0}features/{0}feature/[@name='{1}']".format(self.namespace, feature_name)):
+
+            packages.extend(self.packages(xml_edition, filter))
+
+        return packages
+
+    def packages_selected_userfeature(self, userfeature_name, filter={}):
+        """
+            Returns the packages included in the given userfeature
+
+            the returned dict is constructed in the method packages
+        """
         packages = []
 
         for xml_edition in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, userfeature_name)):
-            for xml_package in xml_edition.findall("./{0}pkgname".format(self.namespace)):
-                package = {}
 
-                package['name'] = xml_package.text
+            packages.extend(self.packages(xml_edition, filter))
 
-                if 'nm' in xml_package.attrib:
-                    package['nm'] = xml_package.get('nm')
+        return packages
 
-                if 'dm' in xml_package.attrib:
-                    package['dm'] = xml_package.get('dm')
 
-                if 'conflicts' in xml_package.attrib:
-                    package['conflicts'] = xml_package.get('conflicts')
+    def packages(self, xml_element, filter={}):
+        """
+            Determines packages found under the given element
 
+            Elements which do contain an attrib with the same value as given in the filter are
+            not added to the result list.
+
+            the returned dict has the following fields:
+
+            name - the name of the edition, a required field
+            nm -
+            dm -
+            conflicts -
+        """
+        packages = []
+
+        for xml_package in xml_element.findall("{0}pkgname".format(self.namespace)):
+            package = self.map_package(xml_package, filter)
+
+            if package:
                 packages.append(package)
 
         return packages
 
+    def map_package(self, xml_package, filter):
+        """
+            maps the given xml_package to a package dict.
+
+            if the filter can be applied None is returned
+        """
+        package = {}
+
+        for key in filter.keys():
+            if key in xml_package.attrib:
+                value = xml_package.get(key)
+                if filter.get(key) not in value:
+                    return None
+
+        package['name'] = xml_package.text
+
+        if 'nm' in xml_package.attrib:
+            package['nm'] = xml_package.get('nm')
+
+        if 'dm' in xml_package.attrib:
+            package['dm'] = xml_package.get('dm')
+
+        if 'conflicts' in xml_package.attrib:
+            package['conflicts'] = xml_package.get('conflicts')
+
+        if 'alias' in xml_package.attrib:
+            package['alias'] = xml_package.get('alias')
+
+        if 'lib' in xml_package.attrib:
+            package['lib'] = xml_package.get('lib')
+
+        return package
 
 
     def transform_to_boolean(self, element, attrib_name):

@@ -102,6 +102,32 @@
     </editions>
 
     <features>
+        <feature name="filesystems">
+            <pkgname alias="btrfs">btrfs-progs</pkgname>
+            <pkgname alias="ext2 ext3 ext4">e2fsprogs</pkgname>
+            <pkgname alias="jsf">jfsutils</pkgname>
+            <pkgname alias="nilfs2">nilfs-utils</pkgname>
+            <pkgname alias="ntfs">ntfs-3g</pkgname>
+            <pkgname alias="raid">dmraid</pkgname>
+            <pkgname alias="reiserfs">reiserfsprogs</pkgname>
+            <pkgname alias="fat16 fat32">dosfstools</pkgname>
+            <pkgname alias="xfs">xfsprogs</pkgname>
+        </feature>
+
+        <feature name="ntp">
+            <pkgname>ntp</pkgname>
+        </feature>
+
+        <feature name="special_fonts">
+            <pkgname alias="zh_TW zh_CN">opendesktop-fonts</pkgname>
+        </feature>
+
+        <feature name="grub">
+            <pkgname>grub</pkgname>
+            <pkgname>os-prober</pkgname>
+            <pkgname alias="uefi">efibootmgr</pkgname>
+            <pkgname alias="uefi">dosfstools</pkgname>
+        </feature>
 
     </features>
 
@@ -112,53 +138,7 @@
         </broadcom>
     </net>
 
-    <special_fonts>
-        <chinese>
-            <pkgname>opendesktop-fonts</pkgname>
-        </chinese>
-    </special_fonts>
-
-    <ntp>
-        <pkgname>ntp</pkgname>
-    </ntp>
-
-    <grub>
-        <pkgname>grub</pkgname>
-        <pkgname>os-prober</pkgname>
-        <pkgname uefi="true">efibootmgr</pkgname>
-        <pkgname uefi="true">dosfstools</pkgname>
-    </grub>
 -->
-
-    <filesystems>
-        <filesystem name="btrfs">
-            <pkgname>btrfs-progs</pkgname>
-        </filesystem>
-        <filesystem name="ext">
-            <pkgname>e2fsprogs</pkgname>
-        </filesystem>
-        <filesystem name="jfs">
-            <pkgname>jfsutils</pkgname>
-        </filesystem>
-        <filesystem name="nilfs2">
-            <pkgname>nilfs-utils</pkgname>
-        </filesystem>
-        <filesystem name="ntfs">
-            <pkgname>ntfs-3g</pkgname>
-        </filesystem>
-        <filesystem name="raid">
-            <pkgname>dmraid</pkgname>
-        </filesystem>
-        <filesystem name="reiserfs">
-            <pkgname>reiserfsprogs</pkgname>
-        </filesystem>
-        <filesystem name="vfat">
-            <pkgname>dosfstools</pkgname>
-        </filesystem>
-        <filesystem name="xfs">
-            <pkgname>xfsprogs</pkgname>
-        </filesystem>
-    </filesystems>
 
     <!-- User desired features -->
     <userfeatures>

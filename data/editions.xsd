@@ -140,6 +140,7 @@
                     <xs:attribute name="source" type="sourceType" default="repo"/>
                     <xs:attribute name="lib" type="libType"/>
                     <xs:attribute name="conflicts" type="xs:string"/>
+                    <xs:attribute name="alias" type="xs:string"/>
 
                     <!-- Note: only one of the two following should be set -->
                     <xs:attribute name="nm" type="networkManagerType"/>

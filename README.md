@@ -51,7 +51,7 @@ To run the included unit-tests, install the package python-nose and run the foll
 command:
 
 ```
-nostests3 --no-capture
+nosetests3 --nocapture
 ```
 
 ## Translations

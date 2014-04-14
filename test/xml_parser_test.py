@@ -56,11 +56,11 @@ def test_parse_editions():
             assert edition['name'] == 'nox'
             assert edition['title'] == 'Base Install'
 
-def test_packages():
+def test_packages_edition():
 
     parser = XmlParser("test/test-editions.xml")
 
-    packages = parser.packages('gnome')
+    packages = parser.packages_edition('gnome')
 
     assert len(packages) == 16
 
@@ -75,3 +75,19 @@ def test_available_userfeatures():
     assert user_features[0]['description'] == 'ArchUserRepository'
 
     assert user_features[1].get('description', 'EMPTY') == 'EMPTY'
+
+def test_packages_feature():
+
+    parser = XmlParser("test/test-editions.xml")
+
+    packages = parser.packages_feature('filesystems')
+
+    assert len(packages) == 9
+
+    assert packages[0]['name'] == 'btrfs-progs'
+
+    packages = parser.packages_feature('filesystems', {'alias': 'ext2'})
+
+    assert len(packages) == 1
+
+    assert packages[0]['name'] == 'e2fsprogs'
