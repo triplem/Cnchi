@@ -33,6 +33,7 @@ from show_message import warning
 # Import functions
 import config
 import src.info as info
+import src.canonical.utils as utils
 
 _next_page = "language"
 _prev_page = None
@@ -104,16 +105,8 @@ class Welcome(Gtk.Box):
         txt = _("Welcome to Antergos!")
         self.header.set_subtitle(txt)
 
-    @misc.raise_privileges
-    def remove_temp_files(self):
-        tmp_files = [".setup-running", ".km-running", "setup-pacman-running", "setup-mkinitcpio-running", ".tz-running", ".setup" ]
-        for t in tmp_files:
-            p = os.path.join("/tmp", t)
-            if os.path.exists(p):
-                os.remove(p)
-
     def quit_cnchi(self):
-        self.remove_temp_files()
+        utils.remove_temp_files(False)
         logging.info(_("Quiting installer..."))
         self.settings.set('stop_all_threads', True)
         logging.shutdown()

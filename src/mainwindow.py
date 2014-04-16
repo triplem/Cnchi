@@ -40,7 +40,7 @@ import keymap
 import timezone
 import user_info
 import slides
-import canonical.misc as misc
+import canonical.utils as utils
 import info
 import show_message as show
 import desktop_environments as desktops
@@ -49,22 +49,12 @@ from installation import ask as installation_ask
 from installation import automatic as installation_automatic
 from installation import alongside as installation_alongside
 from installation import advanced as installation_advanced
+from installation import xml_helper
+from installation.xml_parser import XmlParser
 
 # Constants (must be uppercase)
 MAIN_WINDOW_WIDTH = 800
 MAIN_WINDOW_HEIGHT = 500
-
-# Some of these tmp files are created with sudo privileges
-# (this should be fixed) meanwhile, we need sudo privileges to remove them
-@misc.raise_privileges
-def remove_temp_files():
-    """ Remove Cnchi temporary files """
-    temp_files = [".setup-running", ".km-running", "setup-pacman-running", \
-        "setup-mkinitcpio-running", ".tz-running", ".setup", "Cnchi.log" ]
-    for temp in temp_files:
-        path = os.path.join("/tmp", temp)
-        if os.path.exists(path):
-            os.remove(path)
 
 class MainWindow(Gtk.ApplicationWindow):
     """ Cnchi main window """
@@ -117,12 +107,6 @@ class MainWindow(Gtk.ApplicationWindow):
 
         # For things we are not ready for users to test
         self.settings.set('z_hidden', cmd_line.z_hidden)
-
-        # Set enabled desktops
-        if self.settings.get('z_hidden'):
-            self.settings.set("desktops", desktops.DESKTOPS_DEV)
-        else:
-            self.settings.set("desktops", desktops.DESKTOPS)
 
         self.ui = Gtk.Builder()
         self.ui.add_from_file(self.ui_dir + "cnchi.ui")
@@ -191,7 +175,14 @@ class MainWindow(Gtk.ApplicationWindow):
             logging.info(_("Using '%s' file as package list"), params['alternate_package_list'])
         else:
             params['alternate_package_list'] = ""
-        
+
+        # load xml file and put it into a place where we can retrieve it easily
+        params['CNCHI_VERSION'] = info.CNCHI_VERSION
+        params['CNCHI_EDITION_URL'] = info.CNCHI_EDITION_URL
+        xml_file = xml_helper.load_xml_file(params)
+        parser = XmlParser(xml_file)
+        self.settings.set('parser', parser)
+
         params['disable_tryit'] = cmd_line.disable_tryit
         params['testing'] = cmd_line.testing
         
@@ -269,7 +260,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def on_exit_button_clicked(self, widget, data=None):
         """ Quit Cnchi """
-        remove_temp_files()
+        utils.remove_temp_files(True)
         logging.info(_("Quiting installer..."))
         self.settings.set('stop_all_threads', True)
         logging.shutdown()

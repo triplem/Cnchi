@@ -97,7 +97,7 @@ class InstallationProcess(multiprocessing.Process):
         self.mount_devices = mount_devices
 
         # Check desktop selected to load packages needed
-        self.desktop = self.settings.get('desktop')
+        self.desktop = self.settings.get('edition')
 
         # Set defaults
         self.desktop_manager = 'lightdm'
@@ -474,91 +474,43 @@ class InstallationProcess(multiprocessing.Process):
         self.prepare_pacman()
         
         self.packages = []
-        
-        if len(self.alternate_package_list) > 0:
-            packages_xml = self.alternate_package_list
-        else:
-            # The list of packages is retrieved from an online XML to let us
-            # control the pkgname in case of any modification
 
-            self.queue_event('info', _("Getting package list..."))
-
-            try:
-                url = 'http://install.antergos.com/packages-%s.xml' % info.CNCHI_VERSION[:3]
-                packages_xml = urllib.request.urlopen(url, timeout=5)
-            except urllib.error.URLError as err:
-                # If the installer can't retrieve the remote file, try to install with a local
-                # copy, that may not be updated
-                logging.warning(err)
-                logging.debug(_("Can't retrieve remote package list, using a local file instead."))
-                data_dir = self.settings.get("data")
-                packages_xml = os.path.join(data_dir, 'packages.xml')
-
-        tree = etree.parse(packages_xml)
-        root = tree.getroot()
+        parser = self.settings.get('parser')
         
         # Add common packages
         logging.debug(_("Adding all desktops common packages"))
 
-        for child in root.iter('common'):
-            for pkg in child.iter('pkgname'):
-                self.packages.append(pkg.text)
+        packages = parser.packages_edition(self.edition)
 
-        # Add specific desktop packages
-        if self.desktop != "nox":
-            for child in root.iter('graphic'):
-                for pkg in child.iter('pkgname'):
-                    # If package is Desktop Manager, save the name to activate the correct service later
-                    if pkg.attrib.get('dm'):
-                        self.desktop_manager = pkg.attrib.get('name')
-                    self.packages.append(pkg.text)
 
-            logging.debug(_("Adding '%s' desktop packages"), self.desktop)
-
-            for child in root.iter(self.desktop + '_desktop'):
-                for pkg in child.iter('pkgname'):
-                    # If package is Network Manager, save the name to activate the correct service later
-                    if pkg.attrib.get('nm'):
-                        self.network_manager = pkg.attrib.get('name')
-                    if pkg.attrib.get('conflicts'):
-                        self.conflicts.append(pkg.attrib.get('conflicts'))
-                    self.packages.append(pkg.text)
-
-            # Set KDE language pack
-            if self.desktop == 'kde':
-                pkg = ""
-                base_name = 'kde-l10n-'
-                lang_name = self.settings.get("language_name").lower()
-                if lang_name == "english":
-                    # There're some English variants available but not all of them.
-                    lang_packs = ['en_gb']
-                    locale = self.settings.get('locale').split('.')[0]
-                    if locale in lang_packs:
-                        pkg = base_name + locale
-                else:
-                    # All the other language packs use their language code
-                    lang_code = self.settings.get('language_code')
-                    pkg = base_name + lang_code
-                if len(pkg) > 0:
-                    logging.debug(_("Selected kde language pack: %s"), pkg)
-                    self.packages.append(pkg)
-        else:
-            # Add specific NoX/Base packages
-            for child in root.iter('nox'):
-                for pkg in child.iter('pkgname'):
-                    if pkg.attrib.get('nm'):
-                        self.network_manager = pkg.attrib.get('name')
-                    if pkg.attrib.get('conflicts'):
-                        self.conflicts.append(pkg.attrib.get('conflicts'))
-                    self.packages.append(pkg.text)
+        # # Set KDE language pack
+        # TODO provide hook method for these kind of logic (configurable in the xml or called automatically)
+        # if self.desktop == 'kde':
+        #     pkg = ""
+        #     base_name = 'kde-l10n-'
+        #     lang_name = self.settings.get("language_name").lower()
+        #     if lang_name == "english":
+        #         # There're some English variants available but not all of them.
+        #         lang_packs = ['en_gb']
+        #         locale = self.settings.get('locale').split('.')[0]
+        #         if locale in lang_packs:
+        #             pkg = base_name + locale
+        #     else:
+        #         # All the other language packs use their language code
+        #         lang_code = self.settings.get('language_code')
+        #         pkg = base_name + lang_code
+        #     if len(pkg) > 0:
+        #         logging.debug(_("Selected kde language pack: %s"), pkg)
+        #         self.packages.append(pkg)
 
         # Add ntp package if user selected it in timezone screen
+        # TODO can we put this in configuration as well??? hook method? specific naming of variables and looping
+        # TODO over all features????
         if self.settings.get('use_ntp'):
-            for child in root.iter('ntp'):
-                for pkg in child.iter('pkgname'):
-                    self.packages.append(pkg.text)
+            packages.extend(parser.packages_feature('ntp'))
 
         # Get packages needed for detected hardware
+        # TODO uh, whoa, this is kinda interesting
         try:
             import hardware.hardware as hardware
             hardware_install = hardware.HardwareInstall()
@@ -1462,9 +1414,10 @@ class InstallationProcess(multiprocessing.Process):
 
         sessions = {'gnome': 'gnome', 'cinnamon': 'cinnamon', 'razor': 'razor-session', 'openbox': 'openbox',
                     'xfce': 'xfce', 'kde': 'kde-plasma', 'mate': 'mate', 'enlightenment': 'enlightenment'}
-        desktop = self.settings.get('desktop')
+
+        desktop = self.settings.get('edition')
         username = self.settings.get('username')
-        
+
         if desktop in sessions:
             session = sessions[desktop]
         else:

@@ -22,7 +22,6 @@
 
 import xml.etree.ElementTree as etree
 
-
 class XmlParser:
 
     def __init__(self, file_name):
@@ -31,8 +30,30 @@ class XmlParser:
         self.namespace = "{http://antergos.com/cnchi/}"
         self.tree = etree.parse(file_name)
 
+    def enabled_editions(self):
+        """
+            returns all enabled editions, which can be shown in the installer.
+        """
+        # if no filter is given, we are just returning all enabled and allowed editions
+        filter = {'enabled': 'true', 'showInInstaller': 'true'}
 
-    def editions_installer(self):
+        return self.editions(filter)
+
+    def show_editions(self, filter):
+        """
+            returns all editions, which can be shown in the installer
+
+            additional filter can be added
+        """
+        if not filter:
+            filter = {}
+
+        filter['showInInstaller': 'true']
+
+        return self.editions(filter)
+
+
+    def editions(self, filter={}):
         """
             returns all editions, which can be shown in the installer.
 
@@ -45,22 +66,33 @@ class XmlParser:
         editions = []
 
         for xml_edition in self.tree.findall("{0}editions/{0}edition".format(self.namespace)):
+            edition = self.map_edition(xml_edition, filter)
 
-            enabled = self.transform_to_boolean(xml_edition, 'enabled')
-            show = self.transform_to_boolean(xml_edition, 'showInInstaller')
-
-            if enabled and show:
-                edition = {}
-                edition['name'] = xml_edition.get('name')
-                edition['title'] = xml_edition.get('title')
-
-                description = xml_edition.find("{0}description".format(self.namespace))
-                if description is not None:
-                    edition['description'] = description.text.strip()
-
+            if edition:
                 editions.append(edition)
 
         return editions
+
+    def map_edition(self, xml_edition, filter):
+        """
+            maps the given xml_edition to an edition dict.
+        """
+        edition = {}
+
+        for key in filter.keys():
+            if key in xml_edition.attrib:
+                value = xml_edition.get(key)
+                if filter.get(key) not in value:
+                    return None
+
+        edition['name'] = xml_edition.get('name')
+        edition['title'] = xml_edition.get('title')
+
+        description = xml_edition.find("{0}description".format(self.namespace))
+        if description is not None:
+            edition['description'] = description.text.strip()
+
+        return edition
 
     def packages_edition(self, edition_name, filter={}):
         """

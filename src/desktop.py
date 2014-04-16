@@ -23,9 +23,11 @@
 """ Desktop screen """
 
 from gi.repository import Gtk, GLib
+from operator import itemgetter
+
 import os
 import logging
-import desktop_environments as desktops
+import collections
 
 _next_page = "features"
 _prev_page = "keymap"
@@ -56,24 +58,31 @@ class DesktopAsk(Gtk.Box):
 
         self.ui.connect_signals(self)
 
-        self.desktop_choice = 'gnome'
+        self.edition_choice = 0
 
-        self.enabled_desktops = self.settings.get("desktops")
-
+        self.set_editions()
         self.set_desktop_list()
 
         super().add(self.ui.get_object("desktop"))
 
-    def translate_ui(self, desktop):
+    def translate_ui(self, id_in_list):
         """ Translates all ui elements """
+        print("translate {}".format(id_in_list))
+
+        edition = self.enabled_editions[id_in_list]
+
+        print("name: {}".format(edition['name']))
+        print("title: {}".format(edition['title']))
+        print("description: {}".format(edition['description']))
+
         label = self.ui.get_object("desktop_info")
-        txt = "<span weight='bold'>%s</span>\n" % desktops.NAMES[desktop]
-        description = desktops.DESCRIPTIONS[desktop]
+        txt = "<span weight='bold'>%s</span>\n" % edition['title']
+        description = edition['description']
         txt += _(description)
         label.set_markup(txt)
 
         image = self.ui.get_object("image_desktop")
-        path = os.path.join(self.desktops_dir, desktop + ".png")
+        path = os.path.join(self.desktops_dir, edition['name'] + ".png")
         image.set_from_file(path)
 
         txt = _("Choose Your Desktop")
@@ -81,55 +90,45 @@ class DesktopAsk(Gtk.Box):
 
     def prepare(self, direction):
         """ Prepare screen """
-        self.translate_ui(self.desktop_choice)
+        self.translate_ui(self.edition_choice)
         self.show_all()
 
     def set_desktop_list(self):
         """ Set desktop list in the ListBox """
-        desktop_names = []
-        for desktop in self.enabled_desktops:
-            desktop_names.append(desktops.NAMES[desktop])
-
-        desktop_names.sort()
-
-        for desktop_name in desktop_names:
+        for idx, edition in enumerate(self.enabled_editions):
             box = Gtk.VBox()
             label = Gtk.Label()
-            label.set_markup(desktop_name)
+            label.set_markup(edition['title'])
             label.set_alignment(0, 0.5)
             box.add(label)
             self.listbox.add(box)
-            if desktop_name == desktops.NAMES["gnome"]:
-                self.select_default_row(desktop_name)
+            # gnome is always the default edition
+            # TODO probably we could make this configurable
+            if edition['name'] == 'gnome':
+                self.select_default_row(idx)
+                self.edition_choice = idx
 
-    def select_default_row(self, desktop_name):
-        for listbox_row in self.listbox.get_children():
-            for vbox in listbox_row.get_children():
-                label = vbox.get_children()[0]
-                if desktop_name == label.get_text():
-                    self.listbox.select_row(listbox_row)
-                    return
+    def select_default_row(self, id_in_list):
+        row = self.listbox.get_row_at_index(id_in_list)
+        self.listbox.select_row(row)
+        return
 
-    def set_desktop(self, desktop):
+    def set_desktop(self, row_id):
         """ Show desktop info """
-        for key in desktops.NAMES.keys():
-            if desktops.NAMES[key] == desktop:
-                self.desktop_choice = key
-                self.translate_ui(self.desktop_choice)
-                return
+        self.edition_choice = row_id
+        self.translate_ui(row_id)
+
+        return
 
     def on_listbox_row_selected(self, listbox, listbox_row):
         """ Someone selected a different row of the listbox """
-        if listbox_row is not None:
-            for vbox in listbox_row:
-                for label in vbox.get_children():
-                    desktop = label.get_text()
-                    self.set_desktop(desktop)
+        self.set_desktop(listbox_row.get_index())
     
     def store_values(self):
         """ Store desktop """
-        self.settings.set('desktop', self.desktop_choice)
-        logging.info(_("Cnchi will install Antergos with the '%s' desktop"), self.desktop_choice)
+        edition = self.enabled_editions(self.edition_choice)
+        self.settings.set('edition', edition['name'])
+        logging.info(_("Cnchi will install Antergos with the '%s' edition"), edition['name'])
         return True
     
     def scroll_to_cell(self, treeview, path):
@@ -142,3 +141,20 @@ class DesktopAsk(Gtk.Box):
 
     def get_next_page(self):
         return _next_page
+
+    def set_editions(self):
+        """
+            returns a sorted dict with all editions associated
+
+            key: name of the edition
+            value: the edition itself
+        """
+        parser = self.settings.get('parser')
+
+        # if we would like to show all editions, use a dummy filter ;-) (kind of crude)
+        if self.settings.get('z_hidden'):
+            editions = parser.show_editions()
+        else:
+            editions = parser.enabled_editions()
+
+        self.enabled_editions = sorted(editions, key=itemgetter('title'))

@@ -76,8 +76,8 @@
 
         <edition name="gnome" title="Gnome3" lib="gtk" extends="graphic_common">
             <description>
-                Gnome 3 is an easy and elegant way to use your computer. It features the Activities Overview which
-                is an easy way to access all your basic tasks. GNOME 3 is the default desktop in Antergos.
+                Gnome 3 is an easy and elegant way to use your computer. It features the Activities Overview which is an
+                easy way to access all your basic tasks. GNOME 3 is the default desktop in Antergos.
             </description>
 
             <pkgname>antergos-gnome-defaults-list</pkgname>
@@ -125,10 +125,8 @@
 
         <edition name="cinnamon" title="Cinnamon" lib="gtk" extends="graphic_common">
             <description>
-                Cinnamon is a fork of GNOME 3 developed
-                by (and for) Linux Mint. It provides users a more traditional desktop
-                interface along with the newest compositing techniques of GNOME 3.
-                Cinnamon is for users of all experience levels.
+                Cinnamon is a fork of GNOME 3 developed by (and for) Linux Mint. It provides users a more traditional desktop
+                interface along with the newest compositing techniques of GNOME 3. Cinnamon is for users of all experience levels.
             </description>
 
             <pkgname>antergos-gnome-defaults-list</pkgname>
@@ -177,10 +175,8 @@
 
         <edition name="xfce" title="Xfce" lib="gtk" extends="graphic_common">
             <description>
-                Xfce is a lightweight desktop environment. It aims to
-                be fast and low on system resources, while remaining visually
-                appealing and user friendly. It is a great option for use
-                on older computers or those with low hardware specifications.
+                Xfce is a lightweight desktop environment. It aims to be fast and low on system resources, while remaining visually
+                appealing and user friendly. It is a great option for use on older computers or those with low hardware specifications.
             </description>
 
             <pkgname>cdrkit</pkgname>
@@ -224,10 +220,8 @@
 
         <edition name="razor" title="Razor-QT" lib="qt" extends="graphic_common">
             <description>
-                Razor-qt is an advanced, easy-to-use, and fast desktop
-                environment based on Qt technologies. It has been
-                tailored for users who value simplicity, speed, and
-                an intuitive interface.
+                Razor-qt is an advanced, easy-to-use, and fast desktop environment based on Qt technologies. It has been
+                tailored for users who value simplicity, speed, and an intuitive interface.
             </description>
 
             <pkgname>clementine</pkgname>
@@ -249,6 +243,11 @@
         </edition>
 
         <edition name="mate" title="Mate" lib="gtk" extends="graphic_common">
+            <description>
+                MATE is a fork of GNOME 2. It provides an intuitive and attractive desktop environment using traditional
+                metaphors for Linux and other Unix-like operating systems.
+            </description>
+
             <pkgname>atril</pkgname>
             <pkgname>caja</pkgname>
             <pkgname>caja-gksu</pkgname>
@@ -294,6 +293,11 @@
         </edition>
 
         <edition name="enlightenment" title="Enlightment" lib="gtk" extends="graphic_common">
+            <description>
+                Enlightenment is not just a window manager for Linux/X11 and others, but also a whole suite of libraries to help
+                you create beautiful user interfaces with much less work
+            </description>
+
             <pkgname>faenza-icon-theme</pkgname>
             <pkgname>gksu</pkgname>
             <pkgname>gvfs-smb</pkgname>
@@ -316,6 +320,12 @@
         </edition>
 
         <edition name="openbox" title="Openbox" lib="gtk" extends="graphic_common">
+            <description>
+                Openbox is a highly configurable, next generation window manager with extensive standards support.
+                It's default theme is well known for its minimalistic appearance and flexibility. Your desktop becomes
+                cleaner, faster.
+            </description>
+
             <pkgname>antergos-slim-theme</pkgname>
             <pkgname>arandr</pkgname>
             <pkgname>conky</pkgname>
@@ -373,6 +383,11 @@
         </edition>
 
         <edition name="kde" title="KDE" lib="qt" extends="graphic_common">
+            <description>
+                If you are looking for a familiar working environment, KDE's Plasma Desktop offers all the tools
+                required for a modern desktop computing experience so you can be productive right from the start.
+            </description>
+
             <pkgname>cdrdao</pkgname>
             <pkgname>clementine</pkgname>
             <pkgname>digikam</pkgname>
@@ -426,7 +441,8 @@
 
         <edition name="nox" title="Base Install" extends="common">
             <description>
-                Base system without X (nox)
+                This option will install Antergos as command-line only system, without any type of graphical interface.
+                After the installation you can customize Antergos by installing packages with the command-line package manager.
             </description>
 
             <!-- archivers -->
@@ -448,6 +464,10 @@
     </editions>
 
     <features>
+        <feature name="ntp">
+            <pkgname>ntp</pkgname>
+        </feature>
+
 
     </features>
 

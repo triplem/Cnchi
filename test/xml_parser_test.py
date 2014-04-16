@@ -38,7 +38,7 @@ def test_parse_editions():
 
     parser = XmlParser('test/test-editions.xml')
 
-    editions = parser.editions_installer()
+    editions = parser.enabled_editions()
 
     logger.debug("Editions: %s" % len(editions))
 
@@ -55,6 +55,15 @@ def test_parse_editions():
         elif counter == 2:
             assert edition['name'] == 'nox'
             assert edition['title'] == 'Base Install'
+
+    # return all editions available
+    editions = parser.editions()
+
+    logger.debug("Editions: %s" % len(editions))
+
+    assert len(editions) == 6
+
+
 
 def test_packages_edition():
 
