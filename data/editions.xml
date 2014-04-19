@@ -527,20 +527,48 @@
     </filesystems>
 
     <!-- User desired features -->
-<!--
     <userfeatures>
-        <userfeature name="aur">
+        <userfeature name="aur" title="Arch User Repository (AUR) Support">
+            <description>
+                The AUR is a community-driven repository for Arch users.
+            </description>
+            <tooltip>
+                Use yaourt to install AUR packages.
+                The AUR was created to organize and share new packages
+                from the community and to help expedite popular packages
+                inclusion into the [community] repository.
+            </tooltip>
+
             <pkgname>yaourt</pkgname>
             <pkgname>cmake</pkgname>
             <pkgname>git</pkgname>
             <pkgname>bzr</pkgname>
         </userfeature>
-        <userfeature name="bluetooth">
+        <userfeature name="bluetooth" title="Bluetooth Support">
+            <description>
+                Enables your system to make wireless connections via Bluetooth.
+            </description>
+            <tooltip>
+                Bluetooth is a standard for the short-range wireless
+                interconnection of cellular phones, computers, and
+                other electronic devices. In Linux, the canonical
+                implementation of the Bluetooth protocol stack is BlueZ
+            </tooltip>
+
             <pkgname lib='qt'>bluedevil</pkgname>
             <pkgname>bluez-utils</pkgname>
             <pkgname lib='gtk'>gnome-bluetooth</pkgname>
         </userfeature>
-        <userfeature name="cups">
+        <userfeature name="cups" title="Printing Support">
+            <description>
+                Installation of printer drivers and management tools.
+            </description>
+            <tooltip>
+                CUPS is the standards-based, open source printing
+                system developed by Apple Inc. for OS® X and other
+                UNIX®-like operating systems.
+            </tooltip>
+
             <pkgname>cups</pkgname>
             <pkgname>cups-pk-helper</pkgname>
             <pkgname>foomatic-db-nonfree</pkgname>
@@ -551,22 +579,46 @@
             <pkgname lib='gtk'>system-config-printer</pkgname>
             <pkgname>splix</pkgname>
         </userfeature>
--->
-<!--
-        <userfeature name="gnome_extra">
--->
+        <userfeature name="gnome_extra" title="Gnome Extra">
+            <description>
+                Installation of additional Gnome applications
+            </description>
+            <tooltip>
+                Contains various optional tools such as a media
+                player, a calculator, an editor and other non-critical
+                applications that go well with the GNOME desktop.
+            </tooltip>
+
             <!-- Gnome extra installs brasero, so why install xfburn too? -->
-<!--
             <pkgname conflicts='xfburn'>gnome-extra</pkgname>
         </userfeature>
-        <userfeature name="fonts">
--->
-            <!-- <pkgname>ttf-droid</pkgname> -->
-<!--
+        <userfeature name="fonts" title="Extra Truetype Fonts">
+            <description>
+                Installation of extra TrueType fonts
+            </description>
+            <tooltip>
+                TrueType is an outline font standard developed by
+                Apple and Microsoft in the late 1980s as a competitor
+                to Adobe's Type 1 fonts used in PostScript. It has
+                become the most common format for fonts on both the
+                Mac OS and Microsoft Windows operating systems.
+            </tooltip>
+
             <pkgname>ttf-freefont</pkgname>
             <pkgname conflicts='ttf-droid'>ttf-google-fonts</pkgname>
         </userfeature>
-        <userfeature name="office">
+        <userfeature name="office" title="LibreOffice">
+            <description>
+                Open source office suite. Supports editing MS Office files.
+            </description>
+            <tooltip>
+                LibreOffice is the free power-packed Open Source
+                personal productivity suite for Windows, Macintosh
+                and Linux, that gives you six feature-rich applications
+                for all your document production and data processing
+                needs: Writer, Calc, Impress, Draw, Math and Base.
+            </tooltip>
+
             <pkgname>libreoffice-calc</pkgname>
             <pkgname>libreoffice-common</pkgname>
             <pkgname lib='gtk'>libreoffice-gnome</pkgname>
@@ -574,28 +626,46 @@
             <pkgname lib='qt'>libreoffice-kde4</pkgname>
             <pkgname>libreoffice-writer</pkgname>
         </userfeature>
--->
         <!-- visual effects for openbox -->
-<!--
-        <userfeature name="visual">
+        <userfeature name="visual" title="Visual Effects">
+            <description>
+                Enable transparency, shadows, and other desktop effects.
+            </description>
+            <tooltip>
+                Compton is a lightweight, standalone composite manager,
+                suitable for use with window managers that do not natively
+                provide compositing functionality. Compton itself is a fork
+                of xcompmgr-dana, which in turn is a fork of xcompmgr.
+                See the compton github page for further information.
+            </tooltip>
+
             <pkgname>compton</pkgname>
             <pkgname>paranoid</pkgname>
         </userfeature>
--->
         <!-- Uncomplicated firewall -->
-<!--
-        <userfeature name="firewall">
+        <userfeature name="firewall" title="Uncomplicated Firewall">
+            <description>
+                Control the incoming and outgoing network traffic.
+            </description>
+            <tooltip>
+                Ufw stands for Uncomplicated Firewall, and is a program for
+                managing a netfilter firewall. It provides a command line
+                interface and aims to be uncomplicated and easy to use.
+            </tooltip>
+
             <pkgname lib='gtk'>gufw</pkgname>
             <pkgname lib='qt'>kcm-ufw</pkgname>
             <pkgname>ufw</pkgname>
         </userfeature>
--->
         <!-- Third party software. Some of it is proprietary -->
-<!--
-        <userfeature name="third_party">
+        <userfeature name="third_party" title="Proprietary Software">
+            <description>
+                Software to play Flash videos, MP3 audio, and other media.
+            </description>
+
             <pkgname>flashplugin</pkgname>
             <pkgname>libdvdcss</pkgname>
         </userfeature>
     </userfeatures>
--->
+
 </cnchi>

@@ -527,6 +527,9 @@ class InstallationProcess(multiprocessing.Process):
             logging.warning(_("Unknown error in hardware module. Output: %s"), err)
             
         # By default, hardware module adds vesa driver but in a NoX install we don't want it
+        # TODO hook method, or do not add those in the first place? or make a new attrib for
+        # TODO packages "remove" to remove those automatically, but those packages should not
+        # TODO get added then.
         if self.desktop == "nox":
             if "v86d" in self.packages:
                 self.packages.remove("v86d")
@@ -561,6 +564,8 @@ class InstallationProcess(multiprocessing.Process):
         logging.debug(_("All features needed packages have been added"))
 
         # Add chinese fonts
+        # TODO cant we use the same like above for "KDE lang packs"? BTW, does gnome not provide
+        # TODO langpacks?
         lang_code = self.settings.get("language_code")
         if lang_code == "zh_TW" or lang_code == "zh_CN":
             logging.debug(_("Selecting chinese fonts."))

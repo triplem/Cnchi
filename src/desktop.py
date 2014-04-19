@@ -67,13 +67,7 @@ class DesktopAsk(Gtk.Box):
 
     def translate_ui(self, id_in_list):
         """ Translates all ui elements """
-        print("translate {}".format(id_in_list))
-
         edition = self.enabled_editions[id_in_list]
-
-        print("name: {}".format(edition['name']))
-        print("title: {}".format(edition['title']))
-        print("description: {}".format(edition['description']))
 
         label = self.ui.get_object("desktop_info")
         txt = "<span weight='bold'>%s</span>\n" % edition['title']
@@ -126,7 +120,7 @@ class DesktopAsk(Gtk.Box):
     
     def store_values(self):
         """ Store desktop """
-        edition = self.enabled_editions(self.edition_choice)
+        edition = self.enabled_editions[self.edition_choice]
         self.settings.set('edition', edition['name'])
         logging.info(_("Cnchi will install Antergos with the '%s' edition"), edition['name'])
         return True

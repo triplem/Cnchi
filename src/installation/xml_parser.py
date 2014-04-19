@@ -73,6 +73,17 @@ class XmlParser:
 
         return editions
 
+    def edition(self, edition_name):
+        """
+            returns the edition object for the given edition name
+        """
+        for xml_edition in self.tree.findall("{0}editions/{0}edition/[@name='{1}']".format(self.namespace, edition_name)):
+            edition = self.map_edition(xml_edition, {})
+
+            # there should be just one, return
+            return edition
+
+
     def map_edition(self, xml_edition, filter):
         """
             maps the given xml_edition to an edition dict.
@@ -116,15 +127,34 @@ class XmlParser:
 
         return packages
 
-    def available_userfeatures(self, edition_name):
+    def enabled_userfeatures(self):
         """
-            returns the list of all available userfeatures and their informations
+            returns only enabled userfeatures
+        """
+        # TODO add test
+        return self.userfeatures({'enabled':'true'})
 
-            the returned dict has the following fields:
 
-            name - the name of the userfeature
-            title - the title of the userfeature
-            description - the description of the userfeature
+    def userfeatures(self, filter={}):
+        """
+            returns the list of all available userfeatures (for all editions).
+        """
+        user_features = []
+
+        for xml_user_feature in self.tree.findall("{0}userfeatures/{0}userfeature".format(self.namespace)):
+            user_feature = self.map_feature(xml_user_feature, filter)
+
+            if user_feature:
+                user_features.append(user_feature)
+
+        return user_features
+
+
+    def available_userfeatures(self, edition_name, filter={}):
+        """
+            returns the list of all available userfeatures for a given edition
+            and their informations
+
         """
         user_features = []
 
@@ -132,16 +162,47 @@ class XmlParser:
             reference = xml_user_feature_ref.get('ref')
 
             for xml_user_feature in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, reference)):
-                user_feature = {}
-                user_feature['name'] = xml_user_feature.get('name')
-                user_feature['title'] = xml_user_feature.get('title')
-                description = xml_user_feature.find("{0}description".format(self.namespace))
-                if description is not None:
-                    user_feature['description'] = description.text.strip()
+                # TODO add filter here as well - make it possible to disable a userfeature without removing it from
+                # TODO all userfeaturesets
+                user_feature = self.map_feature(xml_user_feature, filter)
 
+            if user_feature:
                 user_features.append(user_feature)
 
         return user_features
+
+    def map_feature(self, xml_feature, filter):
+        """
+            maps a user_feature or a feature to a dict
+
+            the returned dict has the following fields:
+
+            name - the name of the feature
+            title - the title of the feature
+            description - the description of the feature
+            tooltip - the tooltip of the feature
+        """
+        # TODO write Test for this method
+        for key in filter.keys():
+            if key in xml_feature.attrib:
+                value = xml_feature.get(key)
+                if filter.get(key) not in value:
+                    return None
+
+        user_feature = {}
+        user_feature['name'] = xml_feature.get('name')
+        user_feature['title'] = xml_feature.get('title')
+        description = xml_feature.find("{0}description".format(self.namespace))
+        tooltip = xml_feature.find("{0}tooltip".format(self.namespace))
+
+        if description is not None:
+            user_feature['description'] = description.text.strip()
+
+        if tooltip is not None:
+            user_feature['tooltip'] = tooltip.text.strip()
+
+        return user_feature
+
 
     def packages_feature(self, feature_name, filter={}):
         """

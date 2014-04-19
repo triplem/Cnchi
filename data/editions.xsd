@@ -120,6 +120,8 @@
     <xs:complexType name="featureType">
         <xs:sequence>
             <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="tooltip" type="xs:string" minOccurs="0" maxOccurs="1"/>
+
             <xs:element ref="pkgname" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute type="xs:string" name="name" use="required"/>

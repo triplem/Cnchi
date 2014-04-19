@@ -54,12 +54,13 @@ class Features(Gtk.Box):
         self.listbox.set_selection_mode(Gtk.SelectionMode.NONE)
         self.listbox.set_sort_func(self.listbox_sort_by_name, None)
 
+        self.parser = self.settings.get('parser')
+
         # Available features (for reference)
-        # if you add a feature, remember to add it's setup in installation_process.py
-        self.all_features = desktops.ALL_FEATURES
+        self.all_features = self.parser.userfeatures()
 
         # Each desktop has its own features
-        self.features_by_desktop = desktops.FEATURES
+#        self.features_by_desktop = desktops.FEATURES
 
         # This is initialized each time this screen is shown in prepare()
         self.features = None
@@ -68,6 +69,7 @@ class Features(Gtk.Box):
         self.titles = {}
         self.switches = {}
 
+        # TODO try to add dynamic list to ui
         for feature in self.all_features:
             object_name = "label_" + feature
             self.labels[feature] = self.ui.get_object(object_name)
@@ -105,154 +107,43 @@ class Features(Gtk.Box):
 
     def translate_ui(self):
         """ Translates features ui """
-        desktop = self.settings.get('desktop')
+        edition_name = self.settings.get('edition')
+        print('edition_name {}'.format(edition_name))
+        edition = self.parser.edition(edition_name)
 
-        txt = desktops.NAMES[desktop] + " - " + _("Feature Selection")
+        txt = edition['title'] + " - " + _("Feature Selection")
         self.header.set_subtitle(txt)
 
-        # AUR
-        txt = _("Arch User Repository (AUR) Support")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["aur"].set_markup(txt)
-        txt = _("The AUR is a community-driven repository for Arch users.")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["aur"].set_markup(txt)
+        # TODO we need to translate all userfeatures, not only those which to belong to the
+        # TODO given edition.
 
-        txt = _("Use yaourt to install AUR packages.\n"
-                "The AUR was created to organize and share new packages\n"
-                "from the community and to help expedite popular packages'\n"
-                "inclusion into the [community] repository.")
-        self.titles["aur"].set_tooltip_markup(txt)
-        self.switches["aur"].set_tooltip_markup(txt)
-        self.labels["aur"].set_tooltip_markup(txt)
+        user_features = self.parser.enabled_userfeatures()
 
-        # Bluetooth
-        txt = _("Bluetooth Support")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["bluetooth"].set_markup(txt)
-        txt = _("Enables your system to make wireless connections via Bluetooth.")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["bluetooth"].set_markup(txt)
+        for feature in user_features:
+            tooltip = None
+            if 'tooltip' in feature.keys:
+                tooltip = feature['tooltip']
 
-        txt = _("Bluetooth is a standard for the short-range wireless\n"
-                "interconnection of cellular phones, computers, and\n"
-                "other electronic devices. In Linux, the canonical\n"
-                "implementation of the Bluetooth protocol stack is BlueZ")
-        self.titles["bluetooth"].set_tooltip_markup(txt)
-        self.switches["bluetooth"].set_tooltip_markup(txt)
-        self.labels["bluetooth"].set_tooltip_markup(txt)
-
-        # Extra TTF Fonts
-        txt = _("Extra Truetype Fonts")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["fonts"].set_markup(txt)
-        txt = _("Installation of extra TrueType fonts")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["fonts"].set_markup(txt)
-
-        txt = _("TrueType is an outline font standard developed by\n"
-                "Apple and Microsoft in the late 1980s as a competitor\n"
-                "to Adobe's Type 1 fonts used in PostScript. It has\n"
-                "become the most common format for fonts on both the\n"
-                "Mac OS and Microsoft Windows operating systems.")
-        self.titles["fonts"].set_tooltip_markup(txt)
-        self.switches["fonts"].set_tooltip_markup(txt)
-        self.labels["fonts"].set_tooltip_markup(txt)
-
-        # Gnome Extra
-        txt = _("Gnome Extra")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["gnome_extra"].set_markup(txt)
-        txt = _("Installation of extra Gnome applications")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["gnome_extra"].set_markup(txt)
-
-        txt = _("Contains various optional tools such as a media\n"
-                "player, a calculator, an editor and other non-critical\n"
-                "applications that go well with the GNOME desktop.\n")
-        self.titles["gnome_extra"].set_tooltip_markup(txt)
-        self.switches["gnome_extra"].set_tooltip_markup(txt)
-        self.labels["gnome_extra"].set_tooltip_markup(txt)
-
-        # Printing support (cups)
-        txt = _("Printing Support")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["cups"].set_markup(txt)
-        txt = _("Installation of printer drivers and management tools.")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["cups"].set_markup(txt)
-
-        txt = _("CUPS is the standards-based, open source printing\n"
-                "system developed by Apple Inc. for OS® X and other\n"
-                "UNIX®-like operating systems.")
-        self.titles["cups"].set_tooltip_markup(txt)
-        self.switches["cups"].set_tooltip_markup(txt)
-        self.labels["cups"].set_tooltip_markup(txt)
-
-        # LibreOffice
-        txt = _("LibreOffice")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["office"].set_markup(txt)
-        txt = _("Open source office suite. Supports editing MS Office files.")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["office"].set_markup(txt)
-
-        txt = _("LibreOffice is the free power-packed Open Source\n"
-                "personal productivity suite for Windows, Macintosh\n"
-                "and Linux, that gives you six feature-rich applications\n"
-                "for all your document production and data processing\n"
-                "needs: Writer, Calc, Impress, Draw, Math and Base.")
-        self.titles["office"].set_tooltip_markup(txt)
-        self.switches["office"].set_tooltip_markup(txt)
-        self.labels["office"].set_tooltip_markup(txt)
-
-        # Visual effects
-        txt = _("Visual Effects")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["visual"].set_markup(txt)
-        txt = _("Enable transparency, shadows, and other desktop effects.")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["visual"].set_markup(txt)
-
-        txt = _("Compton is a lightweight, standalone composite manager,\n"
-                "suitable for use with window managers that do not natively\n"
-                "provide compositing functionality. Compton itself is a fork\n"
-                "of xcompmgr-dana, which in turn is a fork of xcompmgr.\n"
-                "See the compton github page for further information.")
-        self.titles["visual"].set_tooltip_markup(txt)
-        self.switches["visual"].set_tooltip_markup(txt)
-        self.labels["visual"].set_tooltip_markup(txt)
-
-        # Firewall
-        txt = _("Uncomplicated Firewall")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["firewall"].set_markup(txt)
-        txt = _("Control the incoming and outgoing network traffic.")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["firewall"].set_markup(txt)
-
-        txt = _("Ufw stands for Uncomplicated Firewall, and is a program for\n"
-                "managing a netfilter firewall. It provides a command line\n"
-                "interface and aims to be uncomplicated and easy to use.")
-        self.titles["firewall"].set_tooltip_markup(txt)
-        self.switches["firewall"].set_tooltip_markup(txt)
-        self.labels["firewall"].set_tooltip_markup(txt)
-
-        # Proprietary packages (third_party)
-        txt = _("Proprietary Software")
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles["third_party"].set_markup(txt)
-        txt = _("Software to play Flash videos, MP3 audio, and other media.")
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels["third_party"].set_markup(txt)
-
-        # txt = _("")
-        #self.titles["third_party"].set_tooltip_markup(txt)
-        #self.switches["third_party"].set_tooltip_markup(txt)
-        #self.labels["third_party"].set_tooltip_markup(txt)
+            self.translate_ui_from_data(feature['name'], feature['title'], feature['description'], tooltip)
 
         # Sort listbox items
         self.listbox.invalidate_sort()
+
+    def translate_ui_from_data(self, name, title, description, tooltip):
+        # Firewall
+        txt = _(title)
+        txt = "<span weight='bold' size='large'>%s</span>" % txt
+        self.titles[name].set_markup(txt)
+        txt = _(description)
+        txt = "<span size='small'>%s</span>" % txt
+        self.labels[name].set_markup(txt)
+
+        if tooltip:
+            txt = _(tooltip)
+            self.titles[name].set_tooltip_markup(txt)
+            self.switches[name].set_tooltip_markup(txt)
+            self.labels[name].set_tooltip_markup(txt)
+
 
     def hide_features(self):
         """ Hide unused features """
@@ -334,8 +225,10 @@ class Features(Gtk.Box):
 
     def prepare(self, direction):
         """ Prepare features screen to get ready to show itself """
-        desktop = self.settings.get('desktop')
-        self.features = self.features_by_desktop[desktop]
+        edition = self.settings.get('edition')
+
+        self.features = self.parser.available_userfeatures(edition)
+
         self.translate_ui()
         self.show_all()
         self.hide_features()
