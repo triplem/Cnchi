@@ -25,6 +25,7 @@
 from gi.repository import Gtk, WebKit, GLib
 import config
 import os
+import sys
 
 import queue
 from multiprocessing import Queue, Lock
@@ -49,7 +50,7 @@ class Slides(Gtk.Box):
         self.settings = params['settings']
         self.main_progressbar = params['main_progressbar']
 
-        super().__init__()
+        Gtk.Box.__init__(self)
 
         builder = Gtk.Builder()
 
@@ -81,7 +82,7 @@ class Slides(Gtk.Box):
 
         self.scrolled_window.add(self.webview)
 
-        super().add(builder.get_object("slides"))
+        self.add(builder.get_object("slides"))
 
         self.fatal_error = False
         self.should_pulse = False
@@ -148,6 +149,14 @@ class Slides(Gtk.Box):
             self.should_pulse = True
             GLib.timeout_add(100, pbar_pulse)
 
+    @misc.raise_privileges
+    def remove_temp_files(self):
+        tmp_files = [".setup-running", ".km-running", "setup-pacman-running", "setup-mkinitcpio-running", ".tz-running", ".setup" ]
+        for t in tmp_files:
+            p = os.path.join("/tmp", t)
+            if os.path.exists(p):
+                os.remove(p)
+
     def manage_events_from_cb_queue(self):
         """ We should do as less as possible here, we want to maintain our
             queue message as empty as possible """
@@ -196,22 +205,15 @@ class Slides(Gtk.Box):
 
                 install_ok = _("Installation Complete!\nDo you want to restart your system now?")
                 response = show.question(install_ok)
+                self.remove_temp_files()
+                self.settings.set('stop_all_threads', True)
+                #while Gtk.events_pending():
+                #    Gtk.main_iteration()
+                logging.shutdown()
                 if response == Gtk.ResponseType.YES:
-                    logging.shutdown()
                     self.reboot()
                 else:
-                    tmp_files = [".setup-running", ".km-running", "setup-pacman-running", "setup-mkinitcpio-running", ".tz-running", ".setup", "Cnchi.log"]
-                    for t in tmp_files:
-                        p = os.path.join("/tmp", t)
-                        if os.path.exists(p):
-                            # TODO: some of these tmp files are created with sudo privileges
-                            # (this should be fixed) meanwhile, we need sudo privileges to remove them
-                            with misc.raised_privileges():
-                                os.remove(p)
-                    while Gtk.events_pending():
-                        Gtk.main_iteration()
-                    logging.shutdown()
-                    Gtk.main_quit()
+                    sys.exit(0)
                 return False
             elif event[0] == 'error':
                 self.callback_queue.task_done()
@@ -261,3 +263,13 @@ class Slides(Gtk.Box):
         """ Reboots the system, used when installation is finished """
         os.system("sync")
         subprocess.call(["/usr/bin/systemctl", "reboot", "--force", "--no-wall"])
+
+# When testing, no _() is available
+try:
+    _("")
+except NameError as err:
+    def _(message): return message
+
+if __name__ == '__main__':
+    from test_screen import _,run
+    run('Slides')

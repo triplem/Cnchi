@@ -24,16 +24,18 @@ from gi.repository import Gtk, Gdk
 import subprocess, sys, os
 import gettext
 import os
-import canonical.misc as misc
 import logging
 import sys
 
 from show_message import warning
 
 # Import functions
-import config
-import src.info as info
 import src.canonical.utils as utils
+
+try:
+    import src.info as info
+except ImportError:
+    import info
 
 _next_page = "language"
 _prev_page = None
@@ -47,7 +49,7 @@ class Welcome(Gtk.Box):
         self.settings = params['settings']
         self.disable_tryit = params['disable_tryit']
 
-        super().__init__()
+        Gtk.Box.__init__(self)
 
         self.ui = Gtk.Builder()
         self.ui.add_from_file(os.path.join(self.ui_dir, "welcome.ui"))
@@ -82,7 +84,7 @@ class Welcome(Gtk.Box):
 
         self.set_name("welcome")
 
-        super().add(self.ui.get_object("welcome"))
+        self.add(self.ui.get_object("welcome"))
 
     def translate_ui(self):
         txt = ""
@@ -152,3 +154,13 @@ class Welcome(Gtk.Box):
         import timezone
         self.auto_timezone_thread = timezone.AutoTimezoneThread(self.auto_timezone_coords, self.settings)
         self.auto_timezone_thread.start()
+
+# When testing, no _() is available
+try:
+    _("")
+except NameError as err:
+    def _(message): return message
+
+if __name__ == '__main__':
+    from test_screen import _,run
+    run('Welcome')

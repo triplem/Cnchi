@@ -41,7 +41,7 @@ class DesktopAsk(Gtk.Box):
         self.backwards_button = params['backwards_button']
         self.settings = params['settings']
 
-        super().__init__()
+        Gtk.Box.__init__(self)
 
         self.ui = Gtk.Builder()
         self.ui.add_from_file(os.path.join(self.ui_dir, "desktop.ui"))
@@ -63,7 +63,7 @@ class DesktopAsk(Gtk.Box):
         self.set_editions()
         self.set_desktop_list()
 
-        super().add(self.ui.get_object("desktop"))
+        self.add(self.ui.get_object("desktop"))
 
     def translate_ui(self, id_in_list):
         """ Translates all ui elements """
@@ -152,3 +152,13 @@ class DesktopAsk(Gtk.Box):
             editions = parser.enabled_editions()
 
         self.enabled_editions = sorted(editions, key=itemgetter('title'))
+
+# When testing, no _() is available
+try:
+    _("")
+except NameError as err:
+    def _(message): return message
+
+if __name__ == '__main__':
+    from test_screen import _,run
+    run('DesktopAsk')

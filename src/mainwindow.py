@@ -76,8 +76,6 @@ class MainWindow(Gtk.ApplicationWindow):
                           'and run this installer again.') % tmp_running)
             sys.exit(1)
 
-        #super().__init__()
-
         logging.info(_("Cnchi installer version %s"), info.CNCHI_VERSION)
 
         current_process = multiprocessing.current_process()
@@ -117,10 +115,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.header_ui.add_from_file(self.ui_dir + "header.ui")
         self.header = self.header_ui.get_object("header")
 
-        self.header.set_title("Cnchi v%s" % info.CNCHI_VERSION)
-        self.header.set_subtitle(_("Antergos Installer"))
-        self.header.set_show_close_button(True)
-
         self.logo = self.header_ui.get_object("logo")
         data_dir = self.settings.get('data')
         logo_path = os.path.join(data_dir, "images", "antergos", "antergos-logo-mini2.png")
@@ -131,7 +125,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.logo.set_name("logo")
 
         self.main_box = self.ui.get_object("main_box")
-        self.progressbar = self.ui.get_object("progressbar1")
+        self.progressbar = self.ui.get_object("main_progressbar")
         self.progressbar.set_name('process_progressbar')
 
         self.forward_button = self.header_ui.get_object("forward_button")
@@ -168,7 +162,7 @@ class MainWindow(Gtk.ApplicationWindow):
         params['backwards_button'] = self.backwards_button
         params['callback_queue'] = self.callback_queue
         params['settings'] = self.settings
-        params['main_progressbar'] = self.ui.get_object('progressbar1')
+        params['main_progressbar'] = self.progressbar
         
         if cmd_line.packagelist:
             params['alternate_package_list'] = cmd_line.packagelist
@@ -207,7 +201,12 @@ class MainWindow(Gtk.ApplicationWindow):
         self.ui.connect_signals(self)
         self.header_ui.connect_signals(self)
 
-        self.set_title(_('Cnchi - Antergos Installer'))
+        title = "Cnchi %s" % info.CNCHI_VERSION
+        self.set_title(title)
+        self.header.set_title(title)
+        self.header.set_subtitle(_("Antergos Installer"))
+        self.header.set_show_close_button(True)
+
         self.set_position(Gtk.WindowPosition.CENTER)
         self.set_resizable(False)
         self.set_size_request(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)
@@ -245,7 +244,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         # Hide backwards button
         self.backwards_button.hide()
-
+        
         # Hide titlebar but show border decoration
         #self.get_window().set_accept_focus(True)
         #self.get_window().set_decorations(Gdk.WMDecoration.BORDER)
