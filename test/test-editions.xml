@@ -43,6 +43,11 @@
             <pkgname>eog</pkgname>
             <pkgname nm='NetworkManager'>network-manager-applet</pkgname>
             <pkgname>networkmanager-openvpn</pkgname>
+
+            <userfeatureset>
+                <userfeature ref="aur"/>
+                <userfeature ref="bluetooth"/>
+            </userfeatureset>
         </edition>
 
         <edition name="cinnamon" title="Cinnamon" lib="gtk" extends="graphic_common">
@@ -142,10 +147,13 @@
 
     <!-- User desired features -->
     <userfeatures>
-        <userfeature name="aur" title="AUR">
+        <userfeature name="aur" title="AUR" icon-name="icon-name">
             <description>
                 ArchUserRepository
             </description>
+            <tooltip>
+                a test tooltip
+            </tooltip>
 
             <pkgname>yaourt</pkgname>
             <pkgname>cmake</pkgname>

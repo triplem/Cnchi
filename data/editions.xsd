@@ -19,7 +19,7 @@
                 <xs:element ref="editions" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="features" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="userfeatures" minOccurs="0" maxOccurs="1"/>
-                <xs:element ref="filesystems" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="filesystems" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -126,6 +126,8 @@
         </xs:sequence>
         <xs:attribute type="xs:string" name="name" use="required"/>
         <xs:attribute type="xs:string" name="title" use="optional"/>
+        <!-- an icon-name from the local gtk theme -->
+        <xs:attribute type="xs:string" name="icon-name" use="optional"/>
     </xs:complexType>
 
     <xs:complexType name="filesystemType">

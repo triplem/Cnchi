@@ -45,40 +45,21 @@ class Features(Gtk.Box):
         super().__init__()
 
         self.ui = Gtk.Builder()
-
         self.ui.add_from_file(os.path.join(self.ui_dir, "features.ui"))
         self.ui.connect_signals(self)
 
         # Set up list box
         self.listbox = self.ui.get_object("listbox")
         self.listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        self.listbox.set_sort_func(self.listbox_sort_by_name, None)
+#        self.listbox.set_sort_func(self.listbox_sort_by_name, None)
 
         self.parser = self.settings.get('parser')
 
         # Available features (for reference)
-        self.all_features = self.parser.userfeatures()
-
-        # Each desktop has its own features
-#        self.features_by_desktop = desktops.FEATURES
+        self.all_features = self.parser.enabled_userfeatures()
 
         # This is initialized each time this screen is shown in prepare()
         self.features = None
-
-        self.labels = {}
-        self.titles = {}
-        self.switches = {}
-
-        # TODO try to add dynamic list to ui
-        for feature in self.all_features:
-            object_name = "label_" + feature
-            self.labels[feature] = self.ui.get_object(object_name)
-
-            object_name = "label_title_" + feature
-            self.titles[feature] = self.ui.get_object(object_name)
-
-            object_name = "switch_" + feature
-            self.switches[feature] = self.ui.get_object(object_name)
 
         # The first time we load this screen, we try to guess some defaults
         self.defaults = True
@@ -105,14 +86,62 @@ class Features(Gtk.Box):
         # Strings must be swaped, return > 0
         return 1
 
+    def set_features(self):
+        """
+            Adds all features to the listbox
+        """
+        edition_name = self.settings.get('edition')
+        edition = self.parser.edition(edition_name)
+
+        txt = edition['title'] + " - " + _("Feature Selection")
+        self.header.set_subtitle(txt)
+
+        for idx, feature in enumerate(self.features):
+            if 'tooltip' in feature:
+                txt = _(feature['tooltip'])
+
+            row = Gtk.ListBoxRow()
+            self.listbox.add(row)
+
+            box = Gtk.Box()
+            row.add(box)
+
+            image = Gtk.Image()
+            image.set_property("icon-name", feature['icon-name'])
+            image.set_pixel_size(48)
+            box.pack_start(image, False, False, 0)
+
+            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            box.add(vbox)
+
+            title = _(feature['title'])
+            title = "<span weight='bold' size='large'>%s</span>" % title
+            titleLabel = Gtk.Label(xalign=0, xpad=20)
+            titleLabel.set_markup(title)
+            if 'tooltip' in feature:
+                titleLabel.set_tooltip_markup(txt)
+            vbox.add(titleLabel)
+
+            description = _(feature['description'])
+            description = "<span size='small'>%s</span>" % description
+            descriptionLabel = Gtk.Label(xalign=0, xpad=20)
+            descriptionLabel.set_markup(description)
+            if 'tooltip' in feature:
+                descriptionLabel.set_tooltip_markup(txt)
+            vbox.add(descriptionLabel)
+
+            switch = Gtk.Switch()
+            switch.props.valign = Gtk.Align.CENTER
+            if 'tooltip' in feature:
+                switch.set_tooltip_markup(txt)
+
+            box.pack_end(switch, False, True, 0)
+
     def translate_ui(self):
         """ Translates features ui """
         edition_name = self.settings.get('edition')
         print('edition_name {}'.format(edition_name))
         edition = self.parser.edition(edition_name)
-
-        txt = edition['title'] + " - " + _("Feature Selection")
-        self.header.set_subtitle(txt)
 
         # TODO we need to translate all userfeatures, not only those which to belong to the
         # TODO given edition.
@@ -227,11 +256,18 @@ class Features(Gtk.Box):
         """ Prepare features screen to get ready to show itself """
         edition = self.settings.get('edition')
 
+        print("fetching userfeatures for {}".format(edition))
+
         self.features = self.parser.available_userfeatures(edition)
 
-        self.translate_ui()
+        print("fetched {} userfeatures".format(len(self.features)))
+
+        self.set_features()
+
+#        self.translate_ui()
         self.show_all()
-        self.hide_features()
-        if self.defaults:
-            self.enable_defaults()
-            self.defaults = False
+#        self.hide_features()
+#        if self.defaults:
+#            self.enable_defaults()
+#            self.defaults = False
+

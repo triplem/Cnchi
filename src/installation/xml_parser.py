@@ -162,8 +162,6 @@ class XmlParser:
             reference = xml_user_feature_ref.get('ref')
 
             for xml_user_feature in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, reference)):
-                # TODO add filter here as well - make it possible to disable a userfeature without removing it from
-                # TODO all userfeaturesets
                 user_feature = self.map_feature(xml_user_feature, filter)
 
             if user_feature:
@@ -190,8 +188,11 @@ class XmlParser:
                     return None
 
         user_feature = {}
+
         user_feature['name'] = xml_feature.get('name')
         user_feature['title'] = xml_feature.get('title')
+        user_feature['icon-name'] = xml_feature.get('icon-name')
+
         description = xml_feature.find("{0}description".format(self.namespace))
         tooltip = xml_feature.find("{0}tooltip".format(self.namespace))
 

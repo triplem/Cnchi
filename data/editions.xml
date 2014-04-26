@@ -121,6 +121,18 @@
             <pkgname>xfburn</pkgname>
             <pkgname>xnoise</pkgname>
             <pkgname>zukitwo-themes</pkgname>
+
+            <userfeatureset>
+                <userfeature ref="aur"/>
+                <userfeature ref="bluetooth"/>
+                <userfeature ref="cups"/>
+                <userfeature ref="gnome_extra"/>
+                <userfeature ref="fonts"/>
+                <userfeature ref="office"/>
+                <userfeature ref="visual"/>
+                <userfeature ref="firewall"/>
+                <userfeature ref="third_party"/>
+            </userfeatureset>
         </edition>
 
         <edition name="cinnamon" title="Cinnamon" lib="gtk" extends="graphic_common">
@@ -496,6 +508,7 @@
     </grub>
 -->
 
+<!--
     <filesystems>
         <filesystem name="btrfs">
             <pkgname>btrfs-progs</pkgname>
@@ -525,10 +538,11 @@
             <pkgname>xfsprogs</pkgname>
         </filesystem>
     </filesystems>
+-->
 
     <!-- User desired features -->
     <userfeatures>
-        <userfeature name="aur" title="Arch User Repository (AUR) Support">
+        <userfeature name="aur" title="Arch User Repository (AUR) Support" icon-name="system-software-install">
             <description>
                 The AUR is a community-driven repository for Arch users.
             </description>
@@ -544,7 +558,7 @@
             <pkgname>git</pkgname>
             <pkgname>bzr</pkgname>
         </userfeature>
-        <userfeature name="bluetooth" title="Bluetooth Support">
+        <userfeature name="bluetooth" title="Bluetooth Support" icon-name="bluetooth">
             <description>
                 Enables your system to make wireless connections via Bluetooth.
             </description>
@@ -559,7 +573,7 @@
             <pkgname>bluez-utils</pkgname>
             <pkgname lib='gtk'>gnome-bluetooth</pkgname>
         </userfeature>
-        <userfeature name="cups" title="Printing Support">
+        <userfeature name="cups" title="Printing Support" icon-name="printer">
             <description>
                 Installation of printer drivers and management tools.
             </description>
@@ -579,7 +593,7 @@
             <pkgname lib='gtk'>system-config-printer</pkgname>
             <pkgname>splix</pkgname>
         </userfeature>
-        <userfeature name="gnome_extra" title="Gnome Extra">
+        <userfeature name="gnome_extra" title="Gnome Extra" icon-name="system-software-install">
             <description>
                 Installation of additional Gnome applications
             </description>
@@ -592,7 +606,7 @@
             <!-- Gnome extra installs brasero, so why install xfburn too? -->
             <pkgname conflicts='xfburn'>gnome-extra</pkgname>
         </userfeature>
-        <userfeature name="fonts" title="Extra Truetype Fonts">
+        <userfeature name="fonts" title="Extra Truetype Fonts" icon-name="preferences-desktop-font">
             <description>
                 Installation of extra TrueType fonts
             </description>
@@ -607,7 +621,7 @@
             <pkgname>ttf-freefont</pkgname>
             <pkgname conflicts='ttf-droid'>ttf-google-fonts</pkgname>
         </userfeature>
-        <userfeature name="office" title="LibreOffice">
+        <userfeature name="office" title="LibreOffice" icon-name="accessories-text-editor">
             <description>
                 Open source office suite. Supports editing MS Office files.
             </description>
@@ -627,7 +641,7 @@
             <pkgname>libreoffice-writer</pkgname>
         </userfeature>
         <!-- visual effects for openbox -->
-        <userfeature name="visual" title="Visual Effects">
+        <userfeature name="visual" title="Visual Effects" icon-name="video-display">
             <description>
                 Enable transparency, shadows, and other desktop effects.
             </description>
@@ -643,7 +657,7 @@
             <pkgname>paranoid</pkgname>
         </userfeature>
         <!-- Uncomplicated firewall -->
-        <userfeature name="firewall" title="Uncomplicated Firewall">
+        <userfeature name="firewall" title="Uncomplicated Firewall" icon-name="network-server">
             <description>
                 Control the incoming and outgoing network traffic.
             </description>
@@ -658,7 +672,7 @@
             <pkgname>ufw</pkgname>
         </userfeature>
         <!-- Third party software. Some of it is proprietary -->
-        <userfeature name="third_party" title="Proprietary Software">
+        <userfeature name="third_party" title="Proprietary Software" icon-name="system-software-update">
             <description>
                 Software to play Flash videos, MP3 audio, and other media.
             </description>
