@@ -26,8 +26,8 @@ from gi.repository import Gtk
 import subprocess
 import os
 import logging
-import desktop_environments as desktops
-import canonical.misc as misc
+#import canonical.misc as misc
+
 
 _next_page = "installation_ask"
 _prev_page = "desktop"
@@ -61,11 +61,15 @@ class Features(Gtk.Box):
         # This is initialized each time this screen is shown in prepare()
         self.features = None
 
+        # All switches
+        self.switches = {}
+
         # The first time we load this screen, we try to guess some defaults
         self.defaults = True
 
-        # Only show ufw rules and aur disclaimer info once
-        self.info_already_shown = { "ufw":False, "aur":False }
+        # Only show disclaimers once, set the name of the feature to True, if it is
+        # shown already
+        self.info_already_shown = { }
 
         self.add(self.ui.get_object("features"))
 
@@ -131,59 +135,24 @@ class Features(Gtk.Box):
             vbox.add(descriptionLabel)
 
             switch = Gtk.Switch()
+            switch.set_active(feature['active'])
+            self.switches[feature['name']] = feature['active']
+            switch.connect("notify::active", self.on_switch_activated, feature['name'])
             switch.props.valign = Gtk.Align.CENTER
             if 'tooltip' in feature:
                 switch.set_tooltip_markup(txt)
 
             box.pack_end(switch, False, True, 0)
 
-    def translate_ui(self):
-        """ Translates features ui """
-        edition_name = self.settings.get('edition')
-        print('edition_name {}'.format(edition_name))
-        edition = self.parser.edition(edition_name)
-
-        # TODO we need to translate all userfeatures, not only those which to belong to the
-        # TODO given edition.
-
-        user_features = self.parser.enabled_userfeatures()
-
-        for feature in user_features:
-            tooltip = None
-            if 'tooltip' in feature.keys:
-                tooltip = feature['tooltip']
-
-            self.translate_ui_from_data(feature['name'], feature['title'], feature['description'], tooltip)
-
-        # Sort listbox items
-        self.listbox.invalidate_sort()
-
-    def translate_ui_from_data(self, name, title, description, tooltip):
-        # Firewall
-        txt = _(title)
-        txt = "<span weight='bold' size='large'>%s</span>" % txt
-        self.titles[name].set_markup(txt)
-        txt = _(description)
-        txt = "<span size='small'>%s</span>" % txt
-        self.labels[name].set_markup(txt)
-
-        if tooltip:
-            txt = _(tooltip)
-            self.titles[name].set_tooltip_markup(txt)
-            self.switches[name].set_tooltip_markup(txt)
-            self.labels[name].set_tooltip_markup(txt)
-
-
-    def hide_features(self):
-        """ Hide unused features """
-        for feature in self.all_features:
-            if feature not in self.features:
-                name = feature + "-row"
-                obj = self.ui.get_object(name)
-                obj.hide()
+    def on_switch_activated(self, switch, active, name):
+        if switch.get_active():
+            self.switches[name] = True
+        else:
+            self.switches[name] = False
 
     def enable_defaults(self):
         """ Enable some features by default """
+        # TODO could we put a method name in the active attrib?
         if 'bluetooth' in self.features:
             process1 = subprocess.Popen(["lsusb"], stdout=subprocess.PIPE)
             process2 = subprocess.Popen(["grep", "-i", "bluetooth"], stdin=process1.stdout, stdout=subprocess.PIPE)
@@ -193,48 +162,67 @@ class Features(Gtk.Box):
                 logging.debug(_("Detected bluetooth device. Enabling by default..."))
                 self.switches['bluetooth'].set_active(True)
 
-        if 'firewall' in self.features:
-            self.switches['firewall'].set_active(True)
-
-        if 'cups' in self.features:
-            self.switches['cups'].set_active(True)
-
     def store_values(self):
         """ Get switches values and store them """
-        for feature in self.features:
-            isactive = self.switches[feature].get_active()
-            self.settings.set("feature_" + feature, isactive)
-            if isactive:
-                logging.debug(_("Selected '%s' feature to install"), feature)
+
+        features = []
+        for feature_name in self.switches:
+            if self.switches[feature_name]:
+                features.append(feature_name)
+                logging.debug(_("Selected '%s' feature to install"), feature_name)
+
+        self.settings.set("selected_user_features", features)
+
+        self.show_info_dialogs()
 
         # Show ufw info message if ufw is selected (only once)
-        if self.settings.get("feature_firewall") and not self.info_already_shown["ufw"]:
-            info = self.show_info_dialog("ufw")
-            self.info_already_shown["ufw"] = True
+#        if self.settings.get("feature_firewall") and not self.info_already_shown["ufw"]:
+#            info = self.show_info_dialog("ufw")
+#            self.info_already_shown["ufw"] = True
 
         # Show AUR disclaimer if AUR is selected (only once)
-        if self.settings.get("feature_aur") and not self.info_already_shown["aur"]:
-            info = self.show_info_dialog("aur")
-            self.info_already_shown["aur"] = True
+#        if self.settings.get("feature_aur") and not self.info_already_shown["aur"]:
+#            info = self.show_info_dialog("aur")
+#            self.info_already_shown["aur"] = True
 
         return True
 
-    def show_info_dialog(self, feature):
+    def show_info_dialogs(self):
         """ Some features show an information dialog when this screen is accepted """
-        if feature == "aur":
-            # Aur disclaimer
-            txt1 = _("Arch User Repository - Disclaimer")
-            txt2 = _("The Arch User Repository is a collection of user-submitted PKGBUILDs\n" \
-                "that supplement software available from the official repositories.\n\n" \
-                "The AUR is community driven and NOT supported by Arch or Antergos.\n")
-        elif feature == "ufw":
-            # Ufw rules info
-            txt1 = _("Uncomplicated Firewall will be installed with these rules:")
-            toallow = misc.get_network()
-            txt2 = _("ufw default deny\nufw allow from %s\nufw allow Transmission\nufw allow SSH") % toallow
+        for feature_name in self.switches:
+            if self.switches[feature_name]:
+                feature = self.parser.userfeature(feature_name)
+
+                print(feature)
+
+                if feature and 'infobox' in feature.keys() \
+                    and ( feature_name not in self.info_already_shown.keys() \
+                    or not self.info_already_shown[feature_name]):
+                    self.show_info_dialog(feature)
+
+    def show_info_dialog(self, feature):
+        infodialog = feature['infobox']
+        feature_name = feature['name']
+
+        txt1 = _(infodialog['title'])
+
+        if 'info_method' in infodialog.keys():
+            # this import should be made more dynamic as well...
+            import hook.feature_hook as feature_hook
+            method_to_call = getattr(feature_hook, infodialog['info_method'])
+
+            kwargs = { 'settings': self.settings }
+
+            additional_info = method_to_call(**kwargs)
+        else:
+            addtional_info = ""
+
+        txt2 = _(infodialog['text']) % additional_info
 
         txt1 = "<big>%s</big>" % txt1
         txt2 = "<i>%s</i>" % txt2
+
+        self.info_already_shown[feature_name] = True
 
         info = Gtk.MessageDialog(transient_for=None,
                                  modal=True,
@@ -256,22 +244,10 @@ class Features(Gtk.Box):
         """ Prepare features screen to get ready to show itself """
         edition = self.settings.get('edition')
 
-        print("fetching userfeatures for {}".format(edition))
-
         self.features = self.parser.available_userfeatures(edition)
-
-        print("fetched {} userfeatures".format(len(self.features)))
-
         self.set_features()
 
-#        self.translate_ui()
         self.show_all()
-
-#        self.hide_features()
-#        if self.defaults:
-#            self.enable_defaults()
-#            self.defaults = False
-
 
 # When testing, no _() is available
 try:

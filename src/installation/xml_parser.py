@@ -98,6 +98,7 @@ class XmlParser:
 
         edition['name'] = xml_edition.get('name')
         edition['title'] = xml_edition.get('title')
+        edition['lib'] = xml_edition.get('lib')
 
         description = xml_edition.find("{0}description".format(self.namespace))
         if description is not None:
@@ -155,21 +156,42 @@ class XmlParser:
             returns the list of all available userfeatures for a given edition
             and their informations
 
+            the active attribute will be inherited from the ref to the userfeature itself
         """
         user_features = []
 
         for xml_user_feature_ref in self.tree.findall("{0}editions/{0}edition/[@name='{1}']/{0}userfeatureset/{0}userfeature".format(self.namespace, edition_name)):
             reference = xml_user_feature_ref.get('ref')
 
+            active = None
+            if 'active' in xml_user_feature_ref.attrib:
+                active = xml_user_feature_ref.get('active')
+
             for xml_user_feature in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, reference)):
+                if active:
+                    xml_user_feature.set('active', active)
+
                 user_feature = self.map_feature(xml_user_feature, filter)
 
-            if user_feature:
-                user_features.append(user_feature)
+                if user_feature:
+                        user_features.append(user_feature)
 
         return user_features
 
-    def map_feature(self, xml_feature, filter):
+    def userfeature(self, feature_name):
+        """
+            returns a specific userfeature
+
+        """
+        xml_user_feature = self.tree.find("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, feature_name))
+
+        if xml_user_feature:
+            return self.map_feature(xml_user_feature)
+        else:
+            return None
+
+
+    def map_feature(self, xml_feature, active=None, filter={}):
         """
             maps a user_feature or a feature to a dict
 
@@ -193,14 +215,33 @@ class XmlParser:
         user_feature['title'] = xml_feature.get('title')
         user_feature['icon-name'] = xml_feature.get('icon-name')
 
+        if 'active' in xml_feature.attrib:
+            active = xml_feature.get('active')
+        else:
+            active = "false"
+
+        user_feature['active'] = self.transform_to_boolean(active)
+
         description = xml_feature.find("{0}description".format(self.namespace))
         tooltip = xml_feature.find("{0}tooltip".format(self.namespace))
+        infobox = xml_feature.find("{0}infobox".format(self.namespace))
 
         if description is not None:
             user_feature['description'] = description.text.strip()
 
         if tooltip is not None:
             user_feature['tooltip'] = tooltip.text.strip()
+
+        if infobox is not None:
+            infodialog = {}
+
+            if 'title' in infobox.attrib:
+                infodialog['title'] = infobox.get('title')
+                if infobox.get('infomethod'):
+                    infodialog['info_method'] = infobox.get('infomethod')
+            infodialog['text'] = infobox.text.strip()
+
+            user_feature['infobox'] = infodialog
 
         return user_feature
 
@@ -227,9 +268,8 @@ class XmlParser:
         """
         packages = []
 
-        for xml_edition in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, userfeature_name)):
-
-            packages.extend(self.packages(xml_edition, filter))
+        for xml_userfeature in self.tree.findall("{0}userfeatures/{0}userfeature/[@name='{1}']".format(self.namespace, userfeature_name)):
+            packages.extend(self.packages(xml_userfeature, filter))
 
         return packages
 
@@ -294,3 +334,6 @@ class XmlParser:
 
     def transform_to_boolean(self, element, attrib_name):
         return True if element.get(attrib_name, default='true') == 'true' else False
+
+    def transform_to_boolean(self, content):
+        return True if content == 'true' else False

@@ -482,7 +482,7 @@ class InstallationProcess(multiprocessing.Process):
         # Add common packages
         logging.debug(_("Adding all desktops common packages"))
 
-        packages = parser.packages_edition(self.edition)
+        packages = parser.packages_edition(self.settings.get('edition'))
 
 
         # # Set KDE language pack
@@ -594,52 +594,58 @@ class InstallationProcess(multiprocessing.Process):
                     for pkg in child.iter('pkgname'):
                         self.packages.append(pkg.text)
 
-    def add_features_packages(self, root):
+    def add_features_packages(self):
         """ Selects packages based on user selected features """
-        desktop = self.settings.get("desktop")
-        lib = desktops.LIBS
-        features = desktops.FEATURES
-        
-        for feature in features[desktop]:
-            # Add necessary packages for user desired features to our install list
-            if self.settings.get("feature_" + feature):
-                logging.debug(_("Adding packages for '%s' feature."), feature)
-                for child in root.iter(feature):
-                    for pkg in child.iter('pkgname'):
-                        # If it's a specific gtk or qt package we have to check it
-                        # against our chosen desktop.
-                        plib = pkg.attrib.get('lib')
-                        if plib is None or (plib is not None and desktop in lib[plib]):
-                            logging.debug(_("Selecting package %s for feature %s"), pkg.text, feature)
-                            self.packages.append(pkg.text)
-                        #else:
-                        #    logging.debug(_("Skipping a %s lib package: %s for feature %s"), plib, pkg.text, feature)
-                        
-                        if pkg.attrib.get('conflicts'):
-                            self.conflicts.append(pkg.attrib.get('conflicts'))
+        parser = self.settings.get('parser')
 
-        # Add libreoffice language package
-        if self.settings.get('feature_office'):
-            logging.debug(_("Add libreoffice language package"))
-            pkg = ""
-            lang_name = self.settings.get("language_name").lower()
-            if lang_name == "english":
-                # There're some English variants available but not all of them.
-                lang_packs = ['en-GB', 'en-US', 'en-ZA']
-                locale = self.settings.get('locale').split('.')[0]
-                locale = locale.replace('_', '-')
-                if locale in lang_packs:
-                    pkg = "libreoffice-%s" % locale
+        edition_name = self.settings.get('edition')
+        edition = parser.edition(edition_name)
+
+        features = self.settings.get('selected_user_features')
+
+        packages = []
+
+        for feature in features:
+            feature_pkgs = parser.packages_selected_userfeature(feature)
+
+            for pkg in feature_pkgs:
+                pkg_name = pkg['name']
+
+                if 'conflicts' in pkg:
+                    self.conflicts.append(pkg_name)
+                    continue
+
+                if 'lib' in pkg and 'lib' in edition:
+                    if pkg['lib'] == edition['lib']:
+                        packages.append(pkg_name)
                 else:
-                    # Install American English if there is not an specific
-                    # language package available.
-                    pkg = "libreoffice-en-US"
-            else:
-                # All the other language packs use their language code
-                lang_code = self.settings.get('language_code')
-                lang_code = lang_code.replace('_', '-')
-                pkg = "libreoffice-%s" % lang_code
-            self.packages.append(pkg)
+                    packages.append(pkg_name)
+
+            # Add libreoffice language package
+            # TODO provide hook method for this
+            if feature == 'office':
+                logging.debug(_("Add libreoffice language package"))
+                pkg = ""
+                lang_name = self.settings.get("language_name").lower()
+                if lang_name == "english":
+                    # There're some English variants available but not all of them.
+                    lang_packs = ['en-GB', 'en-US', 'en-ZA']
+                    locale = self.settings.get('locale').split('.')[0]
+                    locale = locale.replace('_', '-')
+                    if locale in lang_packs:
+                        pkg = "libreoffice-%s" % locale
+                    else:
+                        # Install American English if there is not an specific
+                        # language package available.
+                        pkg = "libreoffice-en-US"
+                else:
+                    # All the other language packs use their language code
+                    lang_code = self.settings.get('language_code')
+                    lang_code = lang_code.replace('_', '-')
+                    pkg = "libreoffice-%s" % lang_code
+                packages.append(pkg)
+
+        self.packages.extend(packages)
 
     def get_graphics_card(self):
         """ Get graphics card using hwinfo """

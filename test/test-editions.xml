@@ -64,7 +64,9 @@
 
             <userfeatureset>
                 <userfeature ref="aur"/>
-                <userfeature ref="cups"/>
+                <userfeature ref="bluetooth"/>
+                <userfeature ref="cups" active="false"/>
+                <userfeature ref="office" active="true"/>
             </userfeatureset>
         </edition>
 
@@ -154,18 +156,23 @@
             <tooltip>
                 a test tooltip
             </tooltip>
+            <infobox title="Arch User Repository - Disclaimer">
+                The Arch User Repository is a collection of user-submitted PKGBUILDs\n
+                that supplement software available from the official repositories.\n\n\
+                The AUR is community driven and NOT supported by Arch or Antergos.\n
+            </infobox>
 
             <pkgname>yaourt</pkgname>
             <pkgname>cmake</pkgname>
             <pkgname>git</pkgname>
             <pkgname>bzr</pkgname>
         </userfeature>
-        <userfeature name="bluetooth">
+        <userfeature name="bluetooth" active="true">
             <pkgname lib='qt'>bluedevil</pkgname>
             <pkgname>bluez-utils</pkgname>
             <pkgname lib='gtk'>gnome-bluetooth</pkgname>
         </userfeature>
-        <userfeature name="cups" title="CUPS">
+        <userfeature name="cups" title="CUPS" active="true">
             <pkgname>cups</pkgname>
             <pkgname>cups-pk-helper</pkgname>
             <pkgname>foomatic-db-nonfree</pkgname>
@@ -176,7 +183,7 @@
             <pkgname lib='gtk'>system-config-printer</pkgname>
             <pkgname>splix</pkgname>
         </userfeature>
-        <userfeature name="gnome_extra">
+        <userfeature name="gnome_extra" active="false">
             <!-- Gnome extra installs brasero, so why install xfburn too? -->
             <pkgname conflicts='xfburn'>gnome-extra</pkgname>
         </userfeature>
@@ -184,7 +191,7 @@
             <pkgname>ttf-freefont</pkgname>
             <pkgname conflicts='ttf-droid'>ttf-google-fonts</pkgname>
         </userfeature>
-        <userfeature name="office">
+        <userfeature name="office" active="false">
             <pkgname>libreoffice-calc</pkgname>
             <pkgname>libreoffice-common</pkgname>
             <pkgname lib='gtk'>libreoffice-gnome</pkgname>
@@ -199,6 +206,10 @@
         </userfeature>
         <!-- Uncomplicated firewall -->
         <userfeature name="firewall">
+            <infobox title="Uncomplicated Firewall will be installed with these rules:" infomethod="get_network">
+                ufw default deny\nufw allow from %s\nufw allow Transmission\nufw allow SSH
+            </infobox>
+
             <pkgname lib='gtk'>gufw</pkgname>
             <pkgname lib='qt'>kcm-ufw</pkgname>
             <pkgname>ufw</pkgname>

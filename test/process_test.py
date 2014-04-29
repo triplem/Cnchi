@@ -33,6 +33,7 @@ sys.path.append(os.path.join(parentdir, 'src'))
 
 logger.debug("parentdir: %s" % parentdir)
 
+from installation.xml_parser import XmlParser
 from installation.process import InstallationProcess
 
 def test_pacman_conf_creation():
@@ -54,3 +55,37 @@ def test_pacman_conf_creation():
     logger.debug('Done')
 
     assert os.path.isfile('/tmp/pacman.conf')
+
+def test_add_features_packages():
+    # set needed config options
+    settings = dict()
+
+    # initialize parser (needed for parsing the editions.xml file)
+    parser = XmlParser('test/test-editions.xml')
+    settings['parser'] = parser
+    settings['edition'] = 'gnome'
+    settings['selected_user_features'] = ['aur']
+
+    # create mock object to test just one method and not the __init__
+    mobject = Mock(InstallationProcess)
+
+    mobject.packages = []
+    mobject.settings = settings
+
+    InstallationProcess.add_features_packages(mobject)
+
+    packages = mobject.packages
+
+    assert len(packages) == 4
+
+    mobject.packages = []
+    settings['selected_user_features'] = ['firewall']
+
+    InstallationProcess.add_features_packages(mobject)
+
+    packages = mobject.packages
+
+    logger.debug('LEN...')
+    logger.debug(len(packages))
+
+    assert len(packages) == 4

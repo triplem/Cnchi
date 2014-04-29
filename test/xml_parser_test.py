@@ -63,8 +63,6 @@ def test_parse_editions():
 
     assert len(editions) == 6
 
-
-
 def test_packages_edition():
 
     parser = XmlParser("test/test-editions.xml")
@@ -73,17 +71,58 @@ def test_packages_edition():
 
     assert len(packages) == 16
 
+def test_userfeature():
+
+    parser = XmlParser("test/test-editions.xml")
+
+    user_feature = parser.userfeature('aur')
+
+    assert 'infobox' in user_feature.keys()
+
+    assert 'title' in user_feature['infobox'].keys()
+
+    assert not 'info_method' in user_feature['infobox'].keys()
+
+    user_feature = parser.userfeature('firewall')
+
+    assert 'infobox' in user_feature.keys()
+
+    assert 'title' in user_feature['infobox'].keys()
+
+    assert 'info_method' in user_feature['infobox'].keys()
+
+
 def test_available_userfeatures():
 
     parser = XmlParser("test/test-editions.xml")
 
-    user_features = parser.available_userfeatures('cinnamon')
+    user_features = parser.available_userfeatures('gnome')
 
     assert len(user_features) == 2
 
     assert user_features[0]['description'] == 'ArchUserRepository'
 
     assert user_features[1].get('description', 'EMPTY') == 'EMPTY'
+
+def test_available_userfeatures_with_active_flag():
+
+    parser = XmlParser("test/test-editions.xml")
+
+    user_features = parser.available_userfeatures('cinnamon')
+
+    assert len(user_features) == 4
+
+    assert user_features[0]['description'] == 'ArchUserRepository'
+
+    assert user_features[1].get('description', 'EMPTY') == 'EMPTY'
+
+    assert not user_features[0]['active'] # aur
+    assert user_features[1]['active']     # bluetooth, set in userfeatures
+    assert not user_features[2]['active'] # cups, set to false in userfeatures-ref and true in userfeatures, must be false
+    assert user_features[3]['active']     # office, set to true in userfeatures-ref and false in userfeatures, must be true
+
+    assert user_features[0]['infobox']['title'] == "Arch User Repository - Disclaimer"
+    assert "Arch User Repository is a collection" in user_features[0]['infobox']['text']
 
 def test_packages_feature():
 

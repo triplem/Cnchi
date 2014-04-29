@@ -552,6 +552,11 @@
                 from the community and to help expedite popular packages
                 inclusion into the [community] repository.
             </tooltip>
+            <infobox title="Arch User Repository - Disclaimer">
+                The Arch User Repository is a collection of user-submitted PKGBUILDs\n
+                that supplement software available from the official repositories.\n\n\
+                The AUR is community driven and NOT supported by Arch or Antergos.\n
+            </infobox>
 
             <pkgname>yaourt</pkgname>
             <pkgname>cmake</pkgname>
@@ -573,7 +578,7 @@
             <pkgname>bluez-utils</pkgname>
             <pkgname lib='gtk'>gnome-bluetooth</pkgname>
         </userfeature>
-        <userfeature name="cups" title="Printing Support" icon-name="printer">
+        <userfeature name="cups" title="Printing Support" icon-name="printer" active="true">
             <description>
                 Installation of printer drivers and management tools.
             </description>
@@ -657,7 +662,7 @@
             <pkgname>paranoid</pkgname>
         </userfeature>
         <!-- Uncomplicated firewall -->
-        <userfeature name="firewall" title="Uncomplicated Firewall" icon-name="network-server">
+        <userfeature name="firewall" title="Uncomplicated Firewall" icon-name="network-server" active="true">
             <description>
                 Control the incoming and outgoing network traffic.
             </description>
@@ -666,6 +671,9 @@
                 managing a netfilter firewall. It provides a command line
                 interface and aims to be uncomplicated and easy to use.
             </tooltip>
+            <infobox title="Uncomplicated Firewall will be installed with these rules:" infomethod="get_network">
+                ufw default deny\nufw allow from %s\nufw allow Transmission\nufw allow SSH
+            </infobox>
 
             <pkgname lib='gtk'>gufw</pkgname>
             <pkgname lib='qt'>kcm-ufw</pkgname>
