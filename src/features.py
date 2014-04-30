@@ -169,16 +169,6 @@ class Features(GtkBaseBox):
 
         self.show_info_dialogs()
 
-        # Show ufw info message if ufw is selected (only once)
-#        if self.settings.get("feature_firewall") and not self.info_already_shown["ufw"]:
-#            info = self.show_info_dialog("ufw")
-#            self.info_already_shown["ufw"] = True
-
-        # Show AUR disclaimer if AUR is selected (only once)
-#        if self.settings.get("feature_aur") and not self.info_already_shown["aur"]:
-#            info = self.show_info_dialog("aur")
-#            self.info_already_shown["aur"] = True
-
         return True
 
     def show_info_dialogs(self):
