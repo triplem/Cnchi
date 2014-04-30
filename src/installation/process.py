@@ -215,14 +215,7 @@ class InstallationProcess(multiprocessing.Process):
                 self.queue_fatal_event(txt)
                 return
 
-        if self.method == 'alongside':
-            # Alongside method shrinks selected partition
-            # and creates root and swap partition in the available space
-            boot_partition, root_partition = fs.shrink(self.mount_devices["alongside"])
-            # Alongside method formats root by default (as it is always a new partition)
-            (error, msg) = fs.create_fs(self.mount_devices["/"], "ext4")
-
-        if self.method == 'advanced':
+        if self.method == 'advanced' or self.method == 'alongside':
             root_partition = self.mount_devices["/"]
 
             # NOTE: Advanced method formats root by default in installation_advanced
@@ -338,12 +331,15 @@ class InstallationProcess(multiprocessing.Process):
                 self.download_packages()
                 logging.debug(_("Packages downloaded."))
 
+            # In newer testing isos, cached packages are provided. Try to copy them.
+            self.copy_cached_packages("/var/cache/pacman/pkg")
+
             if self.settings.get('copy_cache'):
-                self.copy_cache_files(self.settings.get('cache'))
+                self.copy_cached_packages(self.settings.get('cache'))
             else:
                 # Wait for all logs (logging and showing message to user is slower than just logging)
-                # if we don't wait, logs get mixed up (when copying cache files waiting more makes no sense
-                # as it is already a slow process)
+                # if we don't wait, logs get mixed up
+                # (when copying cache files waiting more makes no sense as it is already a slow process)
                 self.wait_for_empty_queue(timeout=10)
 
             logging.debug(_("Installing packages..."))
@@ -1348,7 +1344,7 @@ class InstallationProcess(multiprocessing.Process):
         """ Helper function to run a command """
         return subprocess.check_output(command.split()).decode().strip("\n")
 
-    def copy_cache_files(self, cache_dir):
+    def copy_cached_packages(self, cache_dir):
         """ Copy all packages from specified directory to install's target """
         # Check in case user has given a wrong folder
         if not os.path.exists(cache_dir):
@@ -1357,9 +1353,9 @@ class InstallationProcess(multiprocessing.Process):
         dest_dir = os.path.join(self.dest_dir, "var/cache/pacman/pkg")
         if not os.path.exists(dest_dir):
             os.makedirs(dest_dir)
-        self.copy_cache_files_progress(cache_dir, dest_dir)
+        self.copy_files_progress(cache_dir, dest_dir)
     
-    def copy_cache_files_progress(self, src, dst):
+    def copy_files_progress(self, src, dst):
         """ Copy files updating the slides' progress bar """
         percent = 0.0
         items = os.listdir(src)
